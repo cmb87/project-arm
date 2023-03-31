@@ -11,9 +11,9 @@ class ImagePub(Node):
         super().__init__('rpi_image_pub')
 
         self.declare_parameter("pubtopic", "rpi_video_feed")
-        self.declare_parameter("pubperiod", 0.05)
-        self.declare_parameter("width", 320)
-        self.declare_parameter("height", 240)
+        self.declare_parameter("pubperiod", 0.5)
+        self.declare_parameter("width", 352)
+        self.declare_parameter("height", 288)
         self.declare_parameter("cameraId", 0)
 
         self.get_logger().info('Publishing to topic: "%s"' % self.get_parameter('pubtopic').value)
@@ -23,16 +23,24 @@ class ImagePub(Node):
         self.publisher_ = self.create_publisher(Image, self.get_parameter('pubtopic').value, 10)
 
         self.cap = cv2.VideoCapture(self.get_parameter('cameraId').value)
+       # self.cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'))
         self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT,self.get_parameter('height').value)
         self.cap.set(cv2.CAP_PROP_FRAME_WIDTH,self.get_parameter('width').value)
+
+
 
         self.bridge = CvBridge()
 
     def camera_callback(self):
         ret, frame = self.cap.read()
-        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        frame = self.bridge.cv2_to_imgmsg(frame,'mono8')
-        self.publisher_.publish(frame)
+
+        if ret:
+            self.get_logger().info(f"Image shape {frame.shape}")
+
+            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+            frame = self.bridge.cv2_to_imgmsg(frame, 'mono8')
+            self.publisher_.publish(frame)
 
 
 
