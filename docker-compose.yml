@@ -1,0 +1,21 @@
+version: "3.5"
+
+# source /opt/ros/foxy/setup.bash && \
+#    colcon build
+
+services:
+
+  ros2:
+    image: osrf/ros:foxy-desktop
+    restart: always
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
+    container_name: ros2
+    network_mode: "host"
+    volumes:
+      - ./raspberrypi:/rpi_ws
+      - ./server:/server_ws
+    environment:
+      - DISPLAY=192.168.178.120:0.0
+      - ROS_DOMAIN_ID=5
+
