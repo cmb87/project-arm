@@ -1,5 +1,6 @@
 # Packages to install
 
+    apt-get install libgazebo6-dev
     sudo apt install ros-foxy-joint-state-publisher-gui
     sudo apt install ros-foxy-robot-state-publisher
     sudo apt install ros-foxy-xacro

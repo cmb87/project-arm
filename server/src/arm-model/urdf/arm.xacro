@@ -96,7 +96,7 @@
               radius="0.15" length="0.25" />
   
               
-  <!-- END - Robot description -->
+  <!-- END - Robot description Total weight = 1373.401  ==> 13473.065N-->
   
     <!-- This plugin will publish the joint_states for the selected joints 
             (which robot_state_publisher can then use to broadcast the approprate tf). -->
@@ -131,6 +131,7 @@
     https://docs.ros.org/en/ros2_packages/rolling/api/gazebo_plugins/generated/classgazebo__plugins_1_1GazeboRosForce.html
     ros2 topic pub /force geometry_msgs/Wrench  '{force:  {x: 0.0, y: 0.0, z: 0.0}, torque: {x: 0.0,y: 0.0,z: 0.6}}'
     ros2 topic pub -1 /gazebo_ros_force  geometry_msgs/Wrench  '{force:  {x: 0.0, y: 0.0, z: .0}, torque: {x: 0.0,y: 0.0,z: -5000.6}}'
+    ros2 topic pub -1 /force/link_01  geometry_msgs/Wrench  '{force:  {x: 0.0, y: 0.0, z: 13473.06}, torque: {x: 0.0,y: 0.0,z: 0.0}}'
      -->
     
 
@@ -151,16 +152,7 @@
         <link_name>${link_01_name}</link_name>
       </plugin>
     </gazebo>
-<!-- 
-   <gazebo>
-    <controller:gazebo_ros_force name="gazebo_ros_force" plugin="libgazebo_ros_force.so">
-      <alwaysOn>true</alwaysOn>
-      <update>100</update>
-      <updateRate>100.0</updateRate>
-      <bodyName>link_01</bodyName>
-      <topicName>force</topicName>
-    </controller:gazebo_ros_force>
-  </gazebo> -->
-  
+
+
 </robot>
 
