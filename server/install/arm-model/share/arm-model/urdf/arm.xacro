@@ -98,9 +98,70 @@
               
   <!-- END - Robot description -->
   
-  <gazebo>
-    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
-    </plugin>
-  </gazebo>
+    <!-- This plugin will publish the joint_states for the selected joints 
+            (which robot_state_publisher can then use to broadcast the approprate tf). -->
+ 
+    <gazebo>
+      <plugin name="gazebo_ros_joint_state_publisher" filename="libgazebo_ros_joint_state_publisher.so">
+        <update_rate>20</update_rate>
+        <joint_name>${link_00_name}__${link_01_name}</joint_name>
+        <joint_name>${link_01_name}__${link_02_name}</joint_name>
+        <joint_name>${link_03_name}__${link_04_name}</joint_name>
+        <joint_name>${link_04_name}__${link_05_name}</joint_name>
+      </plugin>
+    </gazebo>
+
+    <!-- This plugin will read a JointTrajectory message from the /set_joint_trajectory topic 
+            and move the machine accordingly. It's a bit clunky but it works. -->
+    <!-- You'll probably want to add damping to the joints to stop them it flopping around. 
+            e.g. <dynamics damping="10.0" friction="10.0"/> -->
+    <!-- Here's an example message to publish to test it:
+            ros2 topic pub -1 /set_joint_trajectory trajectory_msgs/msg/JointTrajectory  '{header: {frame_id: world}, joint_names: [slider_joint, arm_joint], points: [  {positions: {0.8,0.6}} ]}' 
+            ros2 topic pub -1 /set_joint_trajectory trajectory_msgs/msg/JointTrajectory  '{header: {frame_id: world}, joint_names: [base_link__link_01], points: [  {positions: {1.8}} ]}'
+            -->
+    <gazebo>
+      <plugin name="gazebo_ros_joint_pose_trajectory"
+        filename="libgazebo_ros_joint_pose_trajectory.so">
+        <update_rate>2</update_rate>
+      </plugin>
+    </gazebo>
+
+    <!-- Ros Gazebo force Plugin -->
+    <!-- http://wiki.ros.org/pr2_gazebo_plugins/Tutorials/Attaching%20a%20GazeboRosForce%20pugin%20to%20Objects%20in%20Simulation
+    https://docs.ros.org/en/ros2_packages/rolling/api/gazebo_plugins/generated/classgazebo__plugins_1_1GazeboRosForce.html
+    ros2 topic pub /force geometry_msgs/Wrench  '{force:  {x: 0.0, y: 0.0, z: 0.0}, torque: {x: 0.0,y: 0.0,z: 0.6}}'
+    ros2 topic pub -1 /gazebo_ros_force  geometry_msgs/Wrench  '{force:  {x: 0.0, y: 0.0, z: .0}, torque: {x: 0.0,y: 0.0,z: -5000.6}}'
+     -->
+    
+
+    <gazebo>
+      <plugin name="gazebo_ros_force" filename="libgazebo_ros_force.so">
+        <alwaysOn>true</alwaysOn>
+        <update>100</update>
+        <updateRate>100.0</updateRate>
+
+        <ros>
+          <!-- Add a namespace -->
+          <namespace>/force</namespace>
+          <!-- Remap the default topic -->
+          <remapping>gazebo_ros_force:=${link_01_name}</remapping>
+
+        </ros>
+        
+        <force_frame>link</force_frame>
+        <link_name>${link_01_name}</link_name>
+      </plugin>
+    </gazebo>
+<!-- 
+   <gazebo>
+    <controller:gazebo_ros_force name="gazebo_ros_force" plugin="libgazebo_ros_force.so">
+      <alwaysOn>true</alwaysOn>
+      <update>100</update>
+      <updateRate>100.0</updateRate>
+      <bodyName>link_01</bodyName>
+      <topicName>force</topicName>
+    </controller:gazebo_ros_force>
+  </gazebo> -->
   
 </robot>
+

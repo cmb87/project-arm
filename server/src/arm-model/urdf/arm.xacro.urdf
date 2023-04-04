@@ -30,17 +30,18 @@
     <origin rpy="0 0 0" xyz="0 0 0.5"/>
     <parent link="base_link"/>
     <child link="link_01"/>
+    <dynamics damping="10.0" friction="10.0"/>
   </joint>
-  <transmission name="trans_base_link__link_01">
-    <type>transmission_interface/SimpleTransmission</type>
-    <joint name="base_link__link_01">
-      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
-    </joint>
-    <actuator name="motor_base_link__link_01">
-      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
-      <mechanicalReduction>1</mechanicalReduction>
-    </actuator>
-  </transmission>
+  <!-- <transmission name="trans_${name}">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="${name}">
+        <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="motor_${name}">
+        <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+        <mechanicalReduction>1</mechanicalReduction>
+      </actuator>
+    </transmission> -->
   <!-- <m_link_mesh name="${link_01_name}"
               origin_rpy="0 0 0" origin_xyz="0 0 -0.1"
               mass="157.633"
@@ -74,17 +75,18 @@
     <origin rpy="0 0 0" xyz="0 0 0.4"/>
     <parent link="link_01"/>
     <child link="link_02"/>
+    <dynamics damping="10.0" friction="10.0"/>
   </joint>
-  <transmission name="trans_link_01__link_02">
-    <type>transmission_interface/SimpleTransmission</type>
-    <joint name="link_01__link_02">
-      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
-    </joint>
-    <actuator name="motor_link_01__link_02">
-      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
-      <mechanicalReduction>1</mechanicalReduction>
-    </actuator>
-  </transmission>
+  <!-- <transmission name="trans_${name}">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="${name}">
+        <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="motor_${name}">
+        <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+        <mechanicalReduction>1</mechanicalReduction>
+      </actuator>
+    </transmission> -->
   <link name="link_02">
     <inertial>
       <mass value="57.906"/>
@@ -110,17 +112,18 @@
     <origin rpy="0 0 0" xyz="0 0 0.8"/>
     <parent link="link_02"/>
     <child link="link_03"/>
+    <dynamics damping="10.0" friction="10.0"/>
   </joint>
-  <transmission name="trans_link_02__link_03">
-    <type>transmission_interface/SimpleTransmission</type>
-    <joint name="link_02__link_03">
-      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
-    </joint>
-    <actuator name="motor_link_02__link_03">
-      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
-      <mechanicalReduction>1</mechanicalReduction>
-    </actuator>
-  </transmission>
+  <!-- <transmission name="trans_${name}">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="${name}">
+        <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="motor_${name}">
+        <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+        <mechanicalReduction>1</mechanicalReduction>
+      </actuator>
+    </transmission> -->
   <link name="link_03">
     <inertial>
       <mass value="57.906"/>
@@ -146,17 +149,18 @@
     <origin rpy="0 0 0" xyz="0 0 0.8"/>
     <parent link="link_03"/>
     <child link="link_04"/>
+    <dynamics damping="10.0" friction="10.0"/>
   </joint>
-  <transmission name="trans_link_03__link_04">
-    <type>transmission_interface/SimpleTransmission</type>
-    <joint name="link_03__link_04">
-      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
-    </joint>
-    <actuator name="motor_link_03__link_04">
-      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
-      <mechanicalReduction>1</mechanicalReduction>
-    </actuator>
-  </transmission>
+  <!-- <transmission name="trans_${name}">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="${name}">
+        <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="motor_${name}">
+        <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+        <mechanicalReduction>1</mechanicalReduction>
+      </actuator>
+    </transmission> -->
   <link name="link_04">
     <inertial>
       <mass value="57.906"/>
@@ -182,17 +186,18 @@
     <origin rpy="0 0 0" xyz="0 0 0.8"/>
     <parent link="link_04"/>
     <child link="link_05"/>
+    <dynamics damping="10.0" friction="10.0"/>
   </joint>
-  <transmission name="trans_link_04__link_05">
-    <type>transmission_interface/SimpleTransmission</type>
-    <joint name="link_04__link_05">
-      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
-    </joint>
-    <actuator name="motor_link_04__link_05">
-      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
-      <mechanicalReduction>1</mechanicalReduction>
-    </actuator>
-  </transmission>
+  <!-- <transmission name="trans_${name}">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="${name}">
+        <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="motor_${name}">
+        <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+        <mechanicalReduction>1</mechanicalReduction>
+      </actuator>
+    </transmission> -->
   <link name="link_05">
     <inertial>
       <mass value="18.056"/>
@@ -213,36 +218,50 @@
     </visual>
   </link>
   <!-- END - Robot description -->
+  <!-- This plugin will publish the joint_states for the selected joints 
+            (which robot_state_publisher can then use to broadcast the approprate tf). -->
   <gazebo>
-    <plugin filename="libgazebo_ros_control.so" name="gazebo_ros_control">
-      
+    <plugin filename="libgazebo_ros_joint_state_publisher.so" name="gazebo_ros_joint_state_publisher">
+      <update_rate>20</update_rate>
+      <joint_name>&quot;base_link&quot;</joint_name>
+      <joint_name>link_01</joint_name>
+      <joint_name>link_02</joint_name>
+      <joint_name>link_03</joint_name>
+      <joint_name>link_05</joint_name>
+      <joint_name>link_06</joint_name>
     </plugin>
   </gazebo>
-
-
-    <!-- This plugin will publish the joint_states for the selected joints 
-            (which robot_state_publisher can then use to broadcast the approprate tf). -->
- 
-  <gazebo>
-      <plugin name="gazebo_ros_joint_state_publisher"
-          filename="libgazebo_ros_joint_state_publisher.so">
-          <update_rate>20</update_rate>
-          <joint_name>slider_joint</joint_name>
-          <joint_name>arm_joint</joint_name>
-      </plugin>
-  </gazebo>
-
-    <!-- This plugin will read a JointTrajectory message from the /set_joint_trajectory topic 
+  <!-- This plugin will read a JointTrajectory message from the /set_joint_trajectory topic 
             and move the machine accordingly. It's a bit clunky but it works. -->
-    <!-- You'll probably want to add damping to the joints to stop them it flopping around. 
+  <!-- You'll probably want to add damping to the joints to stop them it flopping around. 
             e.g. <dynamics damping="10.0" friction="10.0"/> -->
-    <!-- Here's an example message to publish to test it:
+  <!-- Here's an example message to publish to test it:
             ros2 topic pub -1 /set_joint_trajectory trajectory_msgs/msg/JointTrajectory  '{header: {frame_id: world}, joint_names: [slider_joint, arm_joint], points: [  {positions: {0.8,0.6}} ]}' -->
-    <gazebo>
-        <plugin name="gazebo_ros_joint_pose_trajectory"
-            filename="libgazebo_ros_joint_pose_trajectory.so">
-            <update_rate>2</update_rate>
-        </plugin>
-    </gazebo>
-
+  <gazebo>
+    <plugin filename="libgazebo_ros_joint_pose_trajectory.so" name="gazebo_ros_joint_pose_trajectory">
+      <update_rate>2</update_rate>
+    </plugin>
+  </gazebo>
+  <!-- Ros Gazebo force Plugin -->
+  <!-- http://wiki.ros.org/pr2_gazebo_plugins/Tutorials/Attaching%20a%20GazeboRosForce%20pugin%20to%20Objects%20in%20Simulation
+    ros2 pub /force geometry_msgs/Wrench  '{force:  {x: 0.0, y: 0.0, z: 0.0}, torque: {x: 0.0,y: 0.0,z: 0.6}}' -->
+  <gazebo>
+    <plugin filename="libgazebo_ros_force.so" name="gazebo_ros_force">
+      <alwaysOn>true</alwaysOn>
+      <update>100</update>
+      <updateRate>100.0</updateRate>
+      <bodyName>link_01</bodyName>
+      <topicName>force</topicName>
+    </plugin>
+  </gazebo>
+  <!-- 
+   <gazebo>
+    <controller:gazebo_ros_force name="gazebo_ros_force" plugin="libgazebo_ros_force.so">
+      <alwaysOn>true</alwaysOn>
+      <update>100</update>
+      <updateRate>100.0</updateRate>
+      <bodyName>link_01</bodyName>
+      <topicName>force</topicName>
+    </controller:gazebo_ros_force>
+  </gazebo> -->
 </robot>
