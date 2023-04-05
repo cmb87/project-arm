@@ -28,6 +28,7 @@ setup(
     entry_points={
         'console_scripts': [
            'propeller = drone_model.propeller:main',
+           'propellerSingle = drone_model.propellerSingle:main',
         ],
     },
 )

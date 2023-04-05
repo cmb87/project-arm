@@ -12,6 +12,7 @@ class MinimalPublisher(Node):
         super().__init__('minimal_publisher')
 
 
+        # Parameters
         self.publisherArmLeft  = self.create_publisher(Wrench, '/force/prop_left', 10)
         self.publisherArmRight = self.create_publisher(Wrench, '/force/prop_right', 10)
 
