@@ -29,6 +29,7 @@ setup(
         'console_scripts': [
            'propeller = drone_model.propeller:main',
            'propellerSingle = drone_model.propellerSingle:main',
+           'controller = drone_model.controller:main',
         ],
     },
 )

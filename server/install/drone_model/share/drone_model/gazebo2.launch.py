@@ -52,7 +52,19 @@ def generate_launch_description():
         parameters=[{'topicPropellerForce': '/force/prop_left', 'topicPropellerCmd': '/cmd/prop_left', 'use_sim_time': True}] # add other parameters here if required
     )
 
+    propellerLeft = Node(
+        package='drone_model',
+        executable='propellerSingle',
+        output='screen',
+        parameters=[{'topicPropellerForce': '/force/prop_left', 'topicPropellerCmd': '/cmd/prop_left', 'use_sim_time': True}] # add other parameters here if required
+    )
 
+    controller = Node(
+        package='drone_model',
+        executable='controller',
+        output='screen',
+        parameters=[{'use_sim_time': True}] # add other parameters here if required
+    )
 
     # Run the node
     return LaunchDescription([
@@ -60,5 +72,6 @@ def generate_launch_description():
         node_robot_state_publisher,
         spawn_entity,
         propellerRight,
-        propellerLeft
+        propellerLeft,
+        controller
     ])

@@ -22,16 +22,16 @@
   <xacro:m_link_box name="${main_body}"
     origin_rpy="0 0 0" origin_xyz="0 0 0.05"
     mass="0.5"
-    ixx="1.0" ixy="0" ixz="0"
-    iyy="1.0" iyz="0"
-    izz="1.0"
+    ixx="0.1" ixy="0" ixz="0"
+    iyy="0.1" iyz="0"
+    izz="0.1"
     size="0.2 0.06 0.10"
     material="white"
   />
 
   <xacro:m_link_cylinder name="${tail}"
     origin_rpy="0 1.5708 0" origin_xyz="0 0 0.0"
-    mass="0.01"
+    mass="0.0208"
     ixx="0.00001" ixy="0" ixz="0"
     iyy="0.00001" iyz="0"
     izz="0.00001"
@@ -61,21 +61,21 @@
 
   
   <xacro:m_link_box name="${arm_left}"
-    origin_rpy="0 -0.1 -1.5707" origin_xyz="0.02 -0.1 0.02"
+    origin_rpy="0 -0.1 -1.5707" origin_xyz="-0.010 -0.1 0.02"
     mass="0.1"
-    ixx="1.0" ixy="0" ixz="0"
-    iyy="1.0" iyz="0"
-    izz="1.0"
+    ixx="0.00001" ixy="0" ixz="0"
+    iyy="0.00001" iyz="0"
+    izz="0.00001"
     size="0.2 0.02 0.02"
     material="blue"
   />
 
   <xacro:m_link_box name="${arm_right}"
-    origin_rpy="0 -0.1 1.5707" origin_xyz="0.02 0.1 0.02"
+    origin_rpy="0 -0.1 1.5707" origin_xyz="-0.010 0.1 0.02"
     mass="0.1"
-    ixx="1.0" ixy="0" ixz="0"
-    iyy="1.0" iyz="0"
-    izz="1.0"
+    ixx="0.00001" ixy="0" ixz="0"
+    iyy="0.00001" iyz="0"
+    izz="0.00001"
     size="0.2 0.02 0.02"
     material="blue"
   />
@@ -120,14 +120,14 @@
 
   <xacro:m_joint name="${arm_right}__${motor_right}" type="revolute"
     axis_xyz="0 1 0"
-    origin_rpy="0 0 0" origin_xyz="0.02 0.2 0.04"
+    origin_rpy="0 0 0" origin_xyz="-0.010 0.2 0.04"
     parent="${arm_right}" child="${motor_right}"
     limit_e="1000" limit_l="-0.5" limit_u="0.5" limit_v="0.5"
   />
 
   <xacro:m_joint name="${arm_left}__${motor_left}" type="revolute"
     axis_xyz="0 1 0"
-    origin_rpy="0 0 0" origin_xyz="0.02 -0.2 0.04"
+    origin_rpy="0 0 0" origin_xyz="-0.010 -0.2 0.04"
     parent="${arm_left}" child="${motor_left}"
     limit_e="1000" limit_l="-0.5" limit_u="0.5" limit_v="0.5"
   />
@@ -150,11 +150,11 @@
   </gazebo>
   
   <gazebo reference="${prop_right}">
-    <material>Gazebo/Gray</material>
+    <material>Gazebo/Blue</material>
   </gazebo>
 
   <gazebo reference="${prop_left}">
-    <material>Gazebo/Gray</material>
+    <material>Gazebo/Blue</material>
   </gazebo>
 
   <!-- This plugin will publish the joint_states for the selected joints 
