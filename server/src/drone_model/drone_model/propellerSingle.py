@@ -36,7 +36,7 @@ class MinimalPublisher(Node):
 
     def listener_callback(self, msg):
 
-        self.get_logger().info('Publishing Prop: "%s"' % msg.data)
+        #self.get_logger().info('Publishing Prop: "%s"' % msg.data)
 
         force = Vector3()
         force.x = 0.0

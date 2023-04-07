@@ -49,6 +49,7 @@ class MinimalPublisher(Node):
 
         throttle = 5.0*(t+1.0)/2.0
 
+
         engineR = throttle - 1.0*r
         engineL = throttle + 1.0*r
 
