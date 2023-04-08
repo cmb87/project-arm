@@ -1,0 +1,150 @@
+<?xml version="1.0" ?>
+
+<robot name="mrm" xmlns:xacro="http://www.ros.org/wiki/xacro">
+  
+  <!-- BGN - Include -->
+  <xacro:include filename="/dev_ws/robot_parameters.xacro" />
+  <xacro:include filename="/dev_ws/links_joints.xacro" />
+  <!-- END - Include -->
+  
+
+  <!-- BGN - Robot description -->
+  <xacro:m_link_box name="${link_00_name}"
+    origin_rpy="0 0 0" origin_xyz="0 0 ${link_00_dim[2]/2}"
+    mass="1024"
+    ixx="170.667" ixy="0" ixz="0"
+    iyy="170.667" iyz="0"
+    izz="170.667"
+    size="${link_00_dim[0]} ${link_00_dim[1]} ${link_00_dim[2]}"
+  />
+              
+
+  <xacro:m_link_cylinder name="${link_01_name}"
+    origin_rpy="0 0 0" origin_xyz="0 0 ${link_01_dim[1]/2}"
+    mass="0.01"
+    ixx="1.0" ixy="0" ixz="0"
+    iyy="1.0" iyz="0"
+    izz="1.0"
+    radius="${link_01_dim[0]}" length="${link_01_dim[1]}"
+  />
+
+
+  <xacro:m_link_box name="${link_02_name}"
+    origin_rpy="0 0 0" origin_xyz="${link_02_dim[0]/2} 0 0"
+    mass="0.1"
+    ixx="0.1" ixy="0" ixz="0"
+    iyy="0.1" iyz="0"
+    izz="0.1"
+    size="${link_02_dim[0]} ${link_02_dim[1]} ${link_02_dim[2]}"
+  />
+
+
+  <xacro:m_link_box name="${link_03_name}"
+    origin_rpy="0 0 0" origin_xyz="${link_03_dim[0]/2} 0 0"
+    mass="0.1"
+    ixx="0.1" ixy="0" ixz="0"
+    iyy="0.1" iyz="0"
+    izz="0.1"
+    size="${link_03_dim[0]} ${link_03_dim[1]} ${link_03_dim[2]}"
+  />
+
+  <xacro:m_link_box name="${link_04_name}"
+    origin_rpy="0 0 0" origin_xyz="${link_04_dim[0]/2} 0 0"
+    mass="0.1"
+    ixx="0.1" ixy="0" ixz="0"
+    iyy="0.1" iyz="0"
+    izz="0.1"
+    size="${link_04_dim[0]} ${link_04_dim[1]} ${link_04_dim[2]}"
+  />
+
+  <xacro:m_link_box name="${link_05_name}"
+    origin_rpy="0 0 0" origin_xyz="${link_05_dim[0]/2} 0 0"
+    mass="0.1"
+    ixx="0.1" ixy="0" ixz="0"
+    iyy="0.1" iyz="0"
+    izz="0.1"
+    size="${link_05_dim[0]} ${link_05_dim[1]} ${link_05_dim[2]}"
+  />
+
+
+  <xacro:m_link_mesh name="${link_clawR_name}"
+      origin_rpy="0 0 0" origin_xyz="-0.03 -0.014 -0.005"
+      mass="0.1"
+      ixx="0.1" ixy="0" ixz="0"
+      iyy="0.1" iyz="0"
+      izz="0.1"
+      meshfile="package://arm_model/meshes/gripperRight.stl"
+      meshscale="0.001 0.001 0.001"
+  />
+
+  <xacro:m_link_mesh name="${link_clawL_name}"
+      origin_rpy="0 0 0" origin_xyz="-0.03 0.014 -0.005"
+      mass="0.1"
+      ixx="0.1" ixy="0" ixz="0"
+      iyy="0.1" iyz="0"
+      izz="0.1"
+      meshfile="/dev_ws/r/meshes/gripperLeft.stl"
+      meshscale="0.001 0.001 0.001"
+  />
+
+
+
+
+  <xacro:m_joint name="${link_00_name}__${link_01_name}" type="revolute"
+    axis_xyz="0 0 1"
+    origin_rpy="0 0 0" origin_xyz="0 0 ${link_00_dim[2]}"
+    parent="${link_00_name}" child="${link_01_name}"
+    limit_e="1000" limit_l="-1.5708" limit_u="1.5708" limit_v="0.5"
+  />
+           
+  <xacro:m_joint name="${link_01_name}__${link_02_name}" type="revolute"
+    axis_xyz="0 -1 0"
+    origin_rpy="0 0 0" origin_xyz="0 0 ${link_01_dim[1]}"
+    parent="${link_01_name}" child="${link_02_name}"
+    limit_e="1000" limit_l="0.0" limit_u="1.5708" limit_v="0.5"
+  />
+
+  <xacro:m_joint name="${link_02_name}__${link_03_name}" type="revolute"
+    axis_xyz="0 1 0"
+    origin_rpy="0 0 0" origin_xyz="${link_02_dim[0]} 0 0.015"
+    parent="${link_02_name}" child="${link_03_name}"
+    limit_e="1000" limit_l="-1.5708" limit_u="1.5708" limit_v="0.5"
+  />
+
+  <xacro:m_joint name="${link_03_name}__${link_04_name}" type="revolute"
+    axis_xyz="0 1 0"
+    origin_rpy="0 0 0" origin_xyz="${link_03_dim[0]} 0 -0.015"
+    parent="${link_03_name}" child="${link_04_name}"
+    limit_e="1000" limit_l="-1.5708" limit_u="1.5708" limit_v="0.5"
+  />
+
+  <xacro:m_jointStatic name="${link_04_name}__${link_05_name}"
+    origin_rpy="0 0 0" origin_xyz="${link_04_dim[0]} 0 0"
+    parent="${link_04_name}" child="${link_05_name}"
+  />
+
+
+  <xacro:m_joint name="${link_05_name}__${link_clawL_name}" type="revolute"
+    axis_xyz="0 0 -1"
+    origin_rpy="0 0 0" origin_xyz="${link_05_dim[0]} -0.014  -0.00"
+    parent="${link_05_name}" child="${link_clawL_name}"
+    limit_e="1000" limit_l="0.0" limit_u="0.45" limit_v="0.5"
+  />
+    
+  <xacro:m_joint name="${link_05_name}__${link_clawR_name}" type="revolute"
+    axis_xyz="0 0 1"
+    origin_rpy="0 0 0" origin_xyz="${link_05_dim[0]} +0.014  -0.00"
+    parent="${link_05_name}" child="${link_clawR_name}"
+    limit_e="1000" limit_l="0.0" limit_u="0.45" limit_v="0.5"
+  />
+
+
+
+
+
+
+ 
+
+
+</robot>
+

@@ -67,7 +67,7 @@
   />
 
 
-  <m_link_mesh name="${link_clawR_name}"
+  <xacro:m_link_mesh name="${link_clawR_name}"
       origin_rpy="0 0 0" origin_xyz="-0.03 -0.014 -0.005"
       mass="0.1"
       ixx="0.1" ixy="0" ixz="0"
@@ -77,7 +77,7 @@
       meshscale="0.001 0.001 0.001"
   />
 
-  <m_link_mesh name="${link_clawL_name}"
+  <xacro:m_link_mesh name="${link_clawL_name}"
       origin_rpy="0 0 0" origin_xyz="-0.03 0.014 -0.005"
       mass="0.1"
       ixx="0.1" ixy="0" ixz="0"

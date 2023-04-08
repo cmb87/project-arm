@@ -20,11 +20,11 @@ def generate_launch_description():
             default_value='false',
             description='Use simulation (Gazebo) clock if true'
         ),
-      #  Node(
-      #      package="rviz2",
-      #      executable="rviz2",
-      #      name="rviz2"
-      #  ),
+       Node(
+           package="rviz2",
+           executable="rviz2",
+           name="rviz2"
+       ),
         Node(
             package='robot_state_publisher',
             executable='robot_state_publisher',

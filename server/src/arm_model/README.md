@@ -47,3 +47,15 @@ https://classic.gazebosim.org/tutorials?tut=install_ubuntu&cat=install
 # Convert XACRO to URDF
 
     xacro arm.xacro > arm.xacro.urdf
+
+
+
+# Black Screen in Humble vs Foxy
+In the fovy container, OpenGL 3.1 is used:
+from the humble one, it is OpenGL 4.5:
+
+When using docker adding ---ipc=host to the run command or adding ipc: host to the docker-compose file fixes this for me.
+From here: Stack overflow
+
+
+docker run -ti --ipc=host -e DISPLAY=":1" -v /tmp/.X11-unix:/tmp/.X11-unix -v $(pwd)/server:/server_ws moveit/moveit2:humble-release bash
