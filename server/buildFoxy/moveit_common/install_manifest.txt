@@ -1,0 +1,17 @@
+/server_ws/install/moveit_common/share/ament_index/resource_index/package_run_dependencies/moveit_common
+/server_ws/install/moveit_common/share/ament_index/resource_index/parent_prefix_path/moveit_common
+/server_ws/install/moveit_common/share/moveit_common/environment/ament_prefix_path.sh
+/server_ws/install/moveit_common/share/moveit_common/environment/ament_prefix_path.dsv
+/server_ws/install/moveit_common/share/moveit_common/environment/path.sh
+/server_ws/install/moveit_common/share/moveit_common/environment/path.dsv
+/server_ws/install/moveit_common/share/moveit_common/local_setup.bash
+/server_ws/install/moveit_common/share/moveit_common/local_setup.sh
+/server_ws/install/moveit_common/share/moveit_common/local_setup.zsh
+/server_ws/install/moveit_common/share/moveit_common/local_setup.dsv
+/server_ws/install/moveit_common/share/moveit_common/package.dsv
+/server_ws/install/moveit_common/share/ament_index/resource_index/packages/moveit_common
+/server_ws/install/moveit_common/share/moveit_common/cmake/moveit_common-extras.cmake
+/server_ws/install/moveit_common/share/moveit_common/cmake/moveit_commonConfig.cmake
+/server_ws/install/moveit_common/share/moveit_common/cmake/moveit_commonConfig-version.cmake
+/server_ws/install/moveit_common/share/moveit_common/package.xml
+/server_ws/install/moveit_common/share/moveit_common/cmake/moveit_package.cmake

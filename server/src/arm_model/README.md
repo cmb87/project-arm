@@ -12,6 +12,8 @@
     sudo apt install ros-foxy-gazebo-ros-pkgs
     sudo apt install ros-foxy-teleop-twist-joy
     sudo apt install ros-foxy-rmw-cyclonedds-cpp
+     	
+    sudo apt install ros-foxy-moveit_configs_utils
     sudo apt install python3-pip
     sudo apt-get install usbutils
     pip3 install xacro

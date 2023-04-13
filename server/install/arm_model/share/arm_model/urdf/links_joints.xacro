@@ -83,7 +83,7 @@
         <geometry>
           <mesh filename="${meshfile}" scale="${meshscale}"/>
         </geometry>
-        <material name="light_black"/>
+        <!-- <material name="light_black"/> -->
       </visual>
     </link>
   </xacro:macro>

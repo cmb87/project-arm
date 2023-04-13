@@ -4,21 +4,38 @@ version: "3.5"
 #    colcon build
 
 services:
-  ros2:
-    image: osrf/ros:foxy-desktop
+  # ros2:
+  #   image: osrf/ros:foxy-desktop
+  #   restart: always
+  #   stdin_open: true # docker run -i
+  #   tty: true        # docker run -t
+  #   container_name: ros2
+  #   privileged: true
+  #   network_mode: host
+  #   volumes:
+  #     - ./rpi_ws:/rpi_ws
+  #     - ./server:/server_ws
+  #     - /dev/shm:/dev/shm
+  #     - /tmp/.X11-unix:/tmp/.X11-unix
+  #     - /dev/input:/dev/input # For Joystick
+  #   environment:
+  #     - DISPLAY=:1
+  #   #  - ROS_DOMAIN_ID=5
+
+  rosnoetic:
+    image: ros:noetic-ros-base-focal
     restart: always
     stdin_open: true # docker run -i
     tty: true        # docker run -t
-    container_name: ros2
+    container_name: rosnoetic
     privileged: true
     network_mode: host
     volumes:
       - ./rpi_ws:/rpi_ws
-      - ./server:/server_ws
+      - ./server-noetic:/server_ws
       - /dev/shm:/dev/shm
       - /tmp/.X11-unix:/tmp/.X11-unix
       - /dev/input:/dev/input # For Joystick
     environment:
       - DISPLAY=:1
     #  - ROS_DOMAIN_ID=5
-
