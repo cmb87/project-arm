@@ -100,7 +100,7 @@
       </geometry>
     </visual>
   </link>
-  <link name="link_05">
+  <link name="ir_ranger">
     <inertial>
       <mass value="0.1"/>
       <origin rpy="0 0 0" xyz="0.015 0 0"/>
@@ -128,13 +128,13 @@
     <collision>
       <origin rpy="0 0 0" xyz="-0.03 -0.014 -0.005"/>
       <geometry>
-        <mesh filename="package://arm_model/meshes/gripperRight.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://arm-model/meshes/gripperRight.stl" scale="0.001 0.001 0.001"/>
       </geometry>
     </collision>
     <visual>
       <origin rpy="0 0 0" xyz="-0.03 -0.014 -0.005"/>
       <geometry>
-        <mesh filename="package://arm_model/meshes/gripperRight.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://arm-model/meshes/gripperRight.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <!-- <material name="light_black"/> -->
     </visual>
@@ -148,19 +148,19 @@
     <collision>
       <origin rpy="0 0 0" xyz="-0.03 0.014 -0.005"/>
       <geometry>
-        <mesh filename="package://arm_model/meshes/gripperLeft.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://arm-model/meshes/gripperLeft.stl" scale="0.001 0.001 0.001"/>
       </geometry>
     </collision>
     <visual>
       <origin rpy="0 0 0" xyz="-0.03 0.014 -0.005"/>
       <geometry>
-        <mesh filename="package://arm_model/meshes/gripperLeft.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://arm-model/meshes/gripperLeft.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <!-- <material name="light_black"/> -->
     </visual>
   </link>
   <joint name="base_link__link_01" type="revolute">
-    <axis xyz="0 0 1"/>
+    <axis xyz="0 0 -1"/>
     <limit effort="1000" lower="-1.5708" upper="1.5708" velocity="0.5"/>
     <origin rpy="0 0 0" xyz="0 0 0.135"/>
     <parent link="base_link"/>
@@ -169,46 +169,46 @@
   </joint>
   <joint name="link_01__link_02" type="revolute">
     <axis xyz="0 -1 0"/>
-    <limit effort="1000" lower="0.0" upper="1.5708" velocity="0.5"/>
-    <origin rpy="0 0 0" xyz="0 0 0.029"/>
+    <limit effort="1000" lower="-0.7854" upper="0.7854" velocity="0.5"/>
+    <origin rpy="0 -0.698 0" xyz="0 0 0.029"/>
     <parent link="link_01"/>
     <child link="link_02"/>
     <dynamics damping="10.0" friction="10.0"/>
   </joint>
   <joint name="link_02__link_03" type="revolute">
-    <axis xyz="0 1 0"/>
+    <axis xyz="0 -1 0"/>
     <limit effort="1000" lower="-1.5708" upper="1.5708" velocity="0.5"/>
-    <origin rpy="0 0 0" xyz="0.103 0 0.015"/>
+    <origin rpy="0 0.5584 0" xyz="0.103 0 0.015"/>
     <parent link="link_02"/>
     <child link="link_03"/>
     <dynamics damping="10.0" friction="10.0"/>
   </joint>
   <joint name="link_03__link_04" type="revolute">
-    <axis xyz="0 1 0"/>
+    <axis xyz="0 -1 0"/>
     <limit effort="1000" lower="-1.5708" upper="1.5708" velocity="0.5"/>
-    <origin rpy="0 0 0" xyz="0.065 0 -0.015"/>
+    <origin rpy="0 1.047 0" xyz="0.065 0 -0.015"/>
     <parent link="link_03"/>
     <child link="link_04"/>
     <dynamics damping="10.0" friction="10.0"/>
   </joint>
-  <joint name="link_04__link_05" type="fixed">
+  <joint name="link_04__ir_ranger" type="fixed">
     <origin rpy="0 0 0" xyz="0.055 0 0"/>
     <parent link="link_04"/>
-    <child link="link_05"/>
+    <child link="ir_ranger"/>
   </joint>
-  <joint name="link_05__link_clawL" type="revolute">
+  <joint name="ir_ranger__link_clawL" type="revolute">
     <axis xyz="0 0 -1"/>
-    <limit effort="1000" lower="0.0" upper="0.45" velocity="0.5"/>
+    <limit effort="1000" lower="-0.6" upper="0.9" velocity="0.5"/>
     <origin rpy="0 0 0" xyz="0.03 -0.014  -0.00"/>
-    <parent link="link_05"/>
+    <parent link="ir_ranger"/>
     <child link="link_clawL"/>
     <dynamics damping="10.0" friction="10.0"/>
   </joint>
-  <joint name="link_05__link_clawR" type="revolute">
+  <joint name="ir_ranger__link_clawR" type="revolute">
     <axis xyz="0 0 1"/>
-    <limit effort="1000" lower="0.0" upper="0.45" velocity="0.5"/>
+    <limit effort="1000" lower="-0.6" upper="0.9" velocity="0.5"/>
     <origin rpy="0 0 0" xyz="0.03 +0.014  -0.00"/>
-    <parent link="link_05"/>
+    <parent link="ir_ranger"/>
     <child link="link_clawR"/>
     <dynamics damping="10.0" friction="10.0"/>
   </joint>

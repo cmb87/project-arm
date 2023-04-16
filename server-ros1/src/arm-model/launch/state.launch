@@ -15,4 +15,8 @@
       <remap from="joint_states" to="different_joint_states" />
     </node> -->
 
+   <node name="rviz" pkg="rviz" type="rviz" respawn="false" args="-d $(find arm-model)/rviz/arm.rviz" ></node>
+
+
+
   </launch>

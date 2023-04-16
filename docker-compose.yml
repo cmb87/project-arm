@@ -33,12 +33,12 @@ services:
     volumes:
       - ./rpi_ws:/rpi_ws
       - ./server-ros1:/server_ws
-    #  - /dev/shm:/dev/shm
-    #  - /tmp/.X11-unix:/tmp/.X11-unix
-    #  - /dev/input:/dev/input # For Joystick
+      - /dev/shm:/dev/shm
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - /dev/input:/dev/input # For Joystick
     environment:
-    #  - DISPLAY=:1
-      - DISPLAY=192.168.178.120:0.0
+      - DISPLAY=:1
+    #  - DISPLAY=192.168.178.120:0.0
       - ROS_MASTER_URI=http://192.168.178.94:11311
-      - ROS_IP=192.168.178.120
-      - ROS_HOSTNAME=192.168.178.120
+      - ROS_IP=workmasterIV
+      - ROS_HOSTNAME=workmasterIV

@@ -2,6 +2,7 @@
 #include <ros/time.h>
 #include <sensor_msgs/JointState.h>
 #include <sensor_msgs/Range.h>
+#include <std_msgs/Int16MultiArray.h>
 #include <Wire.h>
 #include <VL53L0X.h>
 #include <Servo.h>
@@ -17,7 +18,7 @@ unsigned long range_timer;
 #define SERVO2 5
 #define SERVO3 6
 #define SERVO4 9
-#define SERVO5 11
+#define SERVO5 10
 
 
 #define SERVO1_MID_POS 90
@@ -32,19 +33,22 @@ Servo robot_servos[5];
 // Subscriber Callback to store the jointstate position values in the global variables
 void sub_cb_fn(const sensor_msgs::JointState& msg) {
 
-  robot_servos[0].write(msg.position[0]*(180/3.14) + SERVO1_MID_POS);
-  robot_servos[1].write(msg.position[1]*(180/3.14) + SERVO2_MID_POS);
-  robot_servos[2].write(msg.position[2]*(180/3.14) + SERVO3_MID_POS);
-  robot_servos[3].write(msg.position[3]*(180/3.14) + SERVO4_MID_POS);
-  robot_servos[4].write(msg.position[4]*(180/3.14) + SERVO5_MID_POS);
+  nh.loginfo("Received joint_states");
+
+  robot_servos[0].write( msg.position[0]*(180/3.14) + SERVO1_MID_POS);
+  robot_servos[1].write(-msg.position[1]*(180/3.14) + SERVO2_MID_POS);
+  robot_servos[2].write(-msg.position[2]*(180/3.14) + SERVO3_MID_POS);
+  robot_servos[3].write( msg.position[3]*(180/3.14) + SERVO4_MID_POS);
+  robot_servos[4].write(-msg.position[4]*(180/3.14) + SERVO5_MID_POS);
+  
   
   // Call the method to write the joint positions to the servo motors
-  nh.spinOnce();
-  delay(3);
+  //nh.spinOnce();
+  //delay(3);
 }
 
 // ========================================
-ros::Subscriber<sensor_msgs::JointState> sub_cb("joint_states", &sub_cb_fn);
+ros::Subscriber<sensor_msgs::JointState> sub_cb("joint_states", sub_cb_fn);
 
 sensor_msgs::Range range_msg;
 ros::Publisher pub_range( "range_data", &range_msg);
@@ -87,13 +91,12 @@ void setup() {
 
 
   // Node
-  nh.getHardware()->setBaud(38400);
+  nh.getHardware()->setBaud(115200);
 
   nh.initNode();
-  nh.advertise(pub_range);
   nh.subscribe(sub_cb);
+  nh.advertise(pub_range);
   
-
 
   //nh.negotiateTopics();
   // wait controller to be connected
@@ -111,7 +114,7 @@ void loop() {
   range_msg.range = (float)sensor.readRangeContinuousMillimeters()/1000.0; // (float)sensor.readRangeContinuousMillimeters();
   range_msg.header.stamp = nh.now();
   pub_range.publish(&range_msg);
-  range_timer =  millis();    
+  //range_timer =  millis();    
   //}
 
   delay(100);
