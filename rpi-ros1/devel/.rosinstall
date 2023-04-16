@@ -1,0 +1,2 @@
+- setup-file:
+    local-name: /home/ubuntu/project-arm/rpi-ros1/devel/setup.sh
