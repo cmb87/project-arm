@@ -67,11 +67,20 @@ void setup()
   servo5.attach(11); //D11
 
   // Write to servos
-  servo1.write(90);
-  servo2.write(90);
-  servo3.write(90);
-  servo4.write(90);
-  servo5.write(90);
+  // servo1.write(90);
+  // servo2.write(90);
+  // servo3.write(90);
+  // servo4.write(90);
+  // servo5.write(90); 
+
+  // Write to servos
+  servo1.writeMicroseconds(1500);
+  servo2.writeMicroseconds(1500);
+  servo3.writeMicroseconds(1500);
+  servo4.writeMicroseconds(1500);
+  servo5.writeMicroseconds(1500);
+
+
 
   // ------------------ sensor ------------------
   sensor.setTimeout(500);
@@ -110,13 +119,17 @@ void loop()
     
     // Write to servos
 
-    servo1.write(commandStruct.angle1);
-    servo2.write(commandStruct.angle2);
-    servo3.write(commandStruct.angle3);
-    servo4.write(commandStruct.angle4);
-    servo5.write(commandStruct.angle5);
+    // servo1.write(commandStruct.angle1);
+    // servo2.write(commandStruct.angle2);
+    // servo3.write(commandStruct.angle3);
+    // servo4.write(commandStruct.angle4);
+    // servo5.write(commandStruct.angle5);
 
-
+    servo1.writeMicroseconds(commandStruct.angle1);
+    servo2.writeMicroseconds(commandStruct.angle2);
+    servo3.writeMicroseconds(commandStruct.angle3);
+    servo4.writeMicroseconds(commandStruct.angle4);
+    servo5.writeMicroseconds(commandStruct.angle5);
 
     // ------------------ Receive Serial ---------------
 
