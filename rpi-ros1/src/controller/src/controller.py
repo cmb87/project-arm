@@ -34,11 +34,17 @@ sensorStruct = SensorStruct
 
 # =========================
 def callback(data):
-    cmdStruct.angle1 = int(90 + data.position[0]*RAD2DEG)
-    cmdStruct.angle2 = int(90 + data.position[1]*RAD2DEG)
-    cmdStruct.angle3 = int(90 + data.position[2]*RAD2DEG)
-    cmdStruct.angle4 = int(90 - data.position[3]*RAD2DEG)
-    cmdStruct.angle5 = int(90 - data.position[4]*RAD2DEG)
+    # cmdStruct.angle1 = int(90 + data.position[0]*RAD2DEG)
+    # cmdStruct.angle2 = int(90 + data.position[1]*RAD2DEG)
+    # cmdStruct.angle3 = int(90 + data.position[2]*RAD2DEG)
+    # cmdStruct.angle4 = int(90 - data.position[3]*RAD2DEG)
+    # cmdStruct.angle5 = int(90 - data.position[4]*RAD2DEG)
+    cmdStruct.angle1 = int(1500 + 500*data.position[0]*2/3.14159)
+    cmdStruct.angle2 = int(1500 + 500*data.position[1]*2/3.14159)
+    cmdStruct.angle3 = int(1500 + 500*data.position[2]*2/3.14159)
+    cmdStruct.angle4 = int(1500 - 500*data.position[3]*2/3.14159)
+    cmdStruct.angle5 = int(1500 - 500*data.position[4]*2/3.14159)
+
 
     rospy.loginfo(f"{cmdStruct.angle1} {cmdStruct.angle2} {cmdStruct.angle3} {cmdStruct.angle4} {cmdStruct.angle5}")
 
