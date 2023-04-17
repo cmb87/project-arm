@@ -10,6 +10,7 @@ project(controller)
 find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
+  pySerialTransfer
 )
 
 ## System dependencies are found with CMake's conventions

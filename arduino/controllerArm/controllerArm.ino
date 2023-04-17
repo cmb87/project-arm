@@ -121,7 +121,7 @@ void loop()
     // ------------------ Receive Serial ---------------
 
     if((millis()- startTime) > mInterval) {
-      range1 = sensor.readRangeContinuousMillimeters();
+      range1 = (float)sensor.readRangeContinuousMillimeters()/1000.0;
       startTime = millis();
     }  
 
@@ -136,7 +136,7 @@ void loop()
     sensorStruct.angle5 = servo5.read();
 
 
-    delay(50);
+    delay(3);
     // ------------------ Send Serial ------------------
 
     uint16_t sendSize = 0;
