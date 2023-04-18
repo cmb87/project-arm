@@ -39,14 +39,14 @@ def callback(data):
     # cmdStruct.angle3 = int(90 + data.position[2]*RAD2DEG)
     # cmdStruct.angle4 = int(90 - data.position[3]*RAD2DEG)
     # cmdStruct.angle5 = int(90 - data.position[4]*RAD2DEG)
-    cmdStruct.angle1 = int(1500 + 500*data.position[0]*2/3.14159)
-    cmdStruct.angle2 = int(1500 + 500*data.position[1]*2/3.14159)
-    cmdStruct.angle3 = int(1500 + 500*data.position[2]*2/3.14159)
-    cmdStruct.angle4 = int(1500 - 500*data.position[3]*2/3.14159)
-    cmdStruct.angle5 = int(1500 - 500*data.position[4]*2/3.14159)
+    cmdStruct.angle1 = int(1500 + 600*data.position[0]*2/3.14159)
+    cmdStruct.angle2 = int(1500 + 600*data.position[1]*2/3.14159)
+    cmdStruct.angle3 = int(1500 + 600*data.position[2]*2/3.14159)
+    cmdStruct.angle4 = int(1500 - 600*data.position[3]*2/3.14159)
+    cmdStruct.angle5 = int(1500 - 600*data.position[4]*2/3.14159)
 
 
-    rospy.loginfo(f"{cmdStruct.angle1} {cmdStruct.angle2} {cmdStruct.angle3} {cmdStruct.angle4} {cmdStruct.angle5}")
+   # rospy.loginfo(f"{cmdStruct.angle1} {cmdStruct.angle2} {cmdStruct.angle3} {cmdStruct.angle4} {cmdStruct.angle5}")
 
 
 # =========================
@@ -61,7 +61,7 @@ def main():
 
     rangeMsg = Range()
     rangeMsg.radiation_type = 1
-    rangeMsg.header.frame_id =  "ir_ranger"
+    rangeMsg.header.frame_id = "ir_ranger"
     rangeMsg.field_of_view = 0.44 # 25 degrees
     rangeMsg.min_range = 0.03 #
     rangeMsg.max_range = 2.0 #
