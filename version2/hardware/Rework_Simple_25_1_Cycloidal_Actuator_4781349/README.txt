@@ -1,0 +1,1 @@
+Rework Simple 25:1 Cycloidal Actuator by gouldpa on Thingiverse: https://www.thingiverse.com/thing:4781349
