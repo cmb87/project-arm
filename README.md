@@ -8,6 +8,7 @@ A cheap servo controlled arm with vision system and ROS2 integration :-).
 ![alt text](imgs/operation.gif)
 
 
+![alt text](imgs/animation.gif)
 ## UI in ubuntu
 
 Run 

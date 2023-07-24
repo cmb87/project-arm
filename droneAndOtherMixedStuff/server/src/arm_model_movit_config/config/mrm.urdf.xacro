@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="mrm">
+    <xacro:arg name="initial_positions_file" default="initial_positions.yaml" />
+
+    <!-- Import mrm urdf file -->
+    <xacro:include filename="$(find arm_model)/urdf/arm.xacro" />
+
+    <!-- Import control_xacro -->
+    <xacro:include filename="mrm.ros2_control.xacro" />
+
+
+    <xacro:mrm_ros2_control name="FakeSystem" initial_positions_file="$(arg initial_positions_file)"/>
+
+</robot>

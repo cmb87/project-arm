@@ -105,9 +105,10 @@ class Manipulator:
         # choose the interval based on dt and the time to animate one step
         interval = len(xtrans)
 
-        ani = animation.FuncAnimation(fig, animate, frames=2*len(xtrans),
+        ani = animation.FuncAnimation(fig, animate, frames=len(xtrans),
                                     interval=interval, blit=True, init_func=init)
 
+        ani.save('./animation.gif', writer='imagemagick', fps=60)
         plt.show()
 
 if __name__ == "__main__":
@@ -127,7 +128,7 @@ if __name__ == "__main__":
 
     xt1 =  np.asarray([[0.0,0.8,0.0]])
     xt2 =  np.asarray([[0.8,0.0,0.0]])
-    xt3 =  np.asarray([[0.9,0.6,90.0]])
+    xt3 =  np.asarray([[0.5,0.6,np.pi/2]])
 
     xtrans1, thetaTrans1 = m.pathPlanning(xt1)
     m.xcurrent = xtrans1[-1]
