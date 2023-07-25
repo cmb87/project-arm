@@ -129,20 +129,20 @@ if __name__ == "__main__":
     xt1 =  np.asarray([[0.0,0.8,0.0]])
     xt2 =  np.asarray([[0.8,0.0,0.0]])
     xt3 =  np.asarray([[0.5,0.6,np.pi/2]])
+    xt4 =  np.asarray([[-0.8,0.5,np.deg2rad(30)]])
 
-    xtrans1, thetaTrans1 = m.pathPlanning(xt1)
-    m.xcurrent = xtrans1[-1]
-    m.thetaCurrent = thetaTrans1[-1]
+    xtransAll = []
 
-    xtrans2, thetaTrans2 = m.pathPlanning(xt2)
-    m.xcurrent = xtrans2[-1]
-    m.thetaCurrent = thetaTrans2[-1]
+    for xt in [xt1, xt2, xt3, xt4, xt1, xt3]:
+        xtrans, thetaTrans = m.pathPlanning(xt)
+        m.xcurrent = xtrans[-1]
+        m.thetaCurrent = thetaTrans[-1]
 
-    xtrans3, thetaTrans3 = m.pathPlanning(xt3)
-    m.xcurrent = xtrans3[-1]
-    m.thetaCurrent = thetaTrans3[-1]
+        xtransAll.extend(xtrans)
 
-    m.animate(xtrans1+xtrans2+xtrans3)
+
+
+    m.animate(xtransAll)
 
 
 
