@@ -22,7 +22,6 @@ export default function GeoTag() {
   const [x0, setX0]  = useState<{status: number, x0: number[]} | -1>( robot.forwardKinematic(0.0, 0.0, 0.0) );
   const [joints, setJoints]  = useState<{status: number, jointAngles: number[]} | -1>( {status: 0, jointAngles: [0.0,0.0,0.0]} );
 
-  console.log(x0)
 
   // --------------------- Load Image -------------------
   useEffect( () => {
@@ -39,7 +38,7 @@ export default function GeoTag() {
 
       draw();
     }
-  }, [])
+  }, [x0])
 
 
 
@@ -52,14 +51,16 @@ export default function GeoTag() {
     const ih = rect.height;
     const iw = rect.width;
 
+
     const x1 = robot.getOrigin();
 
     if (ctx) {
+      ctx.canvas.width = iw;
+      ctx.canvas.height = ih;
 
       ctx.globalCompositeOperation = "destination-over";
-      ctx.clearRect(0, 0, 300, 300); // clear canvas
-      ctx.fillStyle = "rgba(0, 0, 0, 0.4)";
-      ctx.strokeStyle = "rgba(0, 153, 255, 0.4)";
+      ctx.clearRect(0, 0, iw, ih); // clear canvas
+
     //   ctx.save();
 
     //   ctx.translate(150, 150);
@@ -89,12 +90,21 @@ export default function GeoTag() {
     //   ctx.beginPath();
     //   ctx.arc(150, 150, 105, 0, Math.PI * 2, false); // Earth orbit
     //   ctx.stroke();
-    
+      
+      ctx.fillStyle = "rgba(255, 0, 0, 1.0)";
+      ctx.strokeStyle = "rgba(0, 153, 255, 1.0)";
+
       ctx.beginPath();
-      ctx.fillRect(Math.floor(x1.x1[0]*iw), Math.floor(x1.x1[2]*ih),10,10); // fill in the pixel at (10,10)
+      ctx.fillRect(Math.floor(x1.x1[0]*iw)-50, Math.floor(x1.x1[2]*ih),100,10); // fill in the pixel at (10,10)
+
+      if (x0 !== -1) {
+        ctx.fillStyle = "rgba(0, 0, 0, 1.0)";
+        ctx.fillRect(Math.floor(x0.x0[0]*iw)-15, Math.floor(x0.x0[2]*ih),30,10); // fill in the pixel at (10,10)
+      }
+      
       ctx.stroke();
 
-      window.requestAnimationFrame(draw);
+     // window.requestAnimationFrame(draw);
   }
   }
 
@@ -104,8 +114,8 @@ export default function GeoTag() {
     if (ctx != null) {
       var rect = ctx.canvas.getBoundingClientRect();
       return {
-        x: (ex-rect.left),/// rect.width,
-        y: (ey-rect.top)/// rect.height
+        x: (ex-rect.left)/ rect.width,
+        y: (ey-rect.top)/ rect.height
       }
     }
   }
@@ -114,7 +124,10 @@ export default function GeoTag() {
     const m = _getRelativeMousePos(ex, ey)
 
     
-    console.log(m)
+    const thetaUpdate = robot.inverseKinematic(m!.x, 0.0, m!.y);
+
+    if (thetaUpdate.status === 0 ) setX0(robot.forwardKinematic(thetaUpdate.jointAngles[0], thetaUpdate.jointAngles[1], thetaUpdate.jointAngles[2]))
+
   } 
 
   return (
@@ -122,12 +135,12 @@ export default function GeoTag() {
 
       <Heading title='Manipulator'/>
       {/* ===================================================================== */}
-      <div className="w-1/3">
+      <div className="w-1/3 border border-gray-300 rounded-xl">
       <canvas 
           ref={canvas}
           width={300}
           height={300}
-          style={{ cursor: 'crosshair', backgroundSize: "100% 100%" }} // backgroundImage: , `url(${imageUrl})`
+          style={{ cursor: 'crosshair'}} // backgroundImage: , `url(${imageUrl})`, backgroundSize: "100% 100%" 
           onMouseDown={(e) => hoverCb(e.clientX, e.clientY, e.button)}
           //onMouseUp={(e) => clickBtnUpCb(e.clientX, e.clientY, e.button)}
           //onMouseLeave={(e) => {setAnnotationSelected(null)}}

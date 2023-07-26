@@ -93,7 +93,9 @@ export class DeltaRobot {
     }
 
     // -----------------------------------------------
-    private delta_calcAngleYZ(x0: number, y0: number, z0: number, theta: number) {
+    private delta_calcAngleYZ(x0: number, y0: number, z0: number) {
+
+      let theta: number = 0.0;
 
       const y1: number = -0.5 * 0.57735 * this.f; // f/2 * tg 30
       y0 -= 0.5 * 0.57735 * this.e;    // shift center to edge
@@ -103,13 +105,13 @@ export class DeltaRobot {
       // discriminant
       const d: number = -(a+b*y1)*(a+b*y1)+this.rf*(b*b*this.rf+this.rf); 
 
-      if (d < 0) return -1; // non-existing point
+      if (d < 0) return {status: -1, theta: theta}; // non-existing point
 
       const yj: number = (y1 - a*b - Math.sqrt(d))/(b*b + 1); // choosing outer point
       const zj: number = a + b*yj;
       theta = 180.0*Math.atan(-zj/(y1 - yj))/this.pi + ((yj>y1)?180.0:0.0);
 
-      return 0;
+      return {status: 0, theta: theta}
     }
     // -----------------------------------------------
     public inverseKinematic(x0: number, y0: number, z0: number) {
@@ -118,17 +120,13 @@ export class DeltaRobot {
       y0 = y0 - this.yoff;
       z0 = z0 - this.zoff;
 
-      let theta1: number = 0.0;
-      let theta2: number = 0.0;
-      let theta3: number = 0.0;
       
-      let status: number = 0;
 
-      status += this.delta_calcAngleYZ(x0, y0, z0, theta1);
-      status += this.delta_calcAngleYZ(x0*this.cos120 + y0*this.sin120, y0*this.cos120-x0*this.sin120, z0, theta2);
-      status += this.delta_calcAngleYZ(x0*this.cos120 - y0*this.sin120, y0*this.cos120+x0*this.sin120, z0, theta3);
+      const res1 = this.delta_calcAngleYZ(x0, y0, z0);
+      const res2 = this.delta_calcAngleYZ(x0*this.cos120 + y0*this.sin120, y0*this.cos120-x0*this.sin120, z0);
+      const res3 = this.delta_calcAngleYZ(x0*this.cos120 - y0*this.sin120, y0*this.cos120+x0*this.sin120, z0);
 
-      return {status: status, jointAngles: [theta1, theta2, theta3]}
+      return {status: res1.status+res2.status+res3.status, jointAngles: [res1.theta, res2.theta, res3.theta]}
     }
 
 
