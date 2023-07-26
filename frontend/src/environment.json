@@ -1,0 +1,24 @@
+{
+    "apiKey": "lol",
+    "apiBase": "https://71j9jj9ld1.execute-api.eu-central-1.amazonaws.com/dev",
+    "uploadAllowedFileTypes": ["JPG", "PNG", "JPEG"],
+    "maxFilesUpload": 100,
+    "api": {
+        "s3PresignedUrlUpload": "/s3/uploads/byte87-smartfarming-datalake",
+        "s3PresignedUrlDownload": "/s3/downloads/byte87-smartfarming-datalake-processed",
+        "s3PresignedUrlAppDownload": "/s3/downloads/byte87-smartfarming-datalake",
+        "datasets": "/db/datasets/byte87-smartfarming-datasets",
+        "files": "/db/files/byte87-smartfarming-files",
+        "ecmeter": "/db/datasets/byte87-smartfarming-ecmeter",
+        "androidApp": "mobile/android/smartFarming.apk",
+        "iosApp": "mobile/ios/smartFarming.ipa"
+    },
+    "routes": [
+        {
+            "label": "Home",
+            "path": "/home"
+        }
+
+    ]
+
+}

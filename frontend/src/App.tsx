@@ -1,24 +1,58 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, {useContext, useState, useEffect} from 'react';
+import {Navigate, Route, Routes} from "react-router-dom";
+import Header from "./components/Header";
+import { BsBugFill } from 'react-icons/bs';
 import './App.css';
 
+import Footer from './components/Footer';
+import Home from './screens/Home';
+import './App.css';
+
+
+
+
+
 function App() {
+
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="h-screen w-full flex flex-col">
+
+      <Routes>
+        <Route path="/" element={<Navigate replace to="/start"/>}/>
+        <Route path="start" element={<Home/>}/>
+        
+
+        <Route path="*" element={
+          <>
+
+            {/* <PrivateRoute> */}
+
+                  <Header/>
+                  <br />
+     
+                  <main className={'w-full pl-0.5 pr-0.5 lg:pl-5 lg:pr-5 items-center flex flex-col flex-grow '}>
+                  {/* <RequestInterceptor> */}
+                    <Routes>
+                      
+                      <Route path="home" element={<Home/>}/>
+
+
+                    </Routes>
+                  {/* </RequestInterceptor> */}
+                  </main>
+
+            {/* </PrivateRoute> */}
+
+ 
+
+          </>  
+        } />
+      </Routes>
+
+      <Footer/>
+  
+
     </div>
   );
 }

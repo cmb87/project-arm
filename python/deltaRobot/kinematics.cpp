@@ -1,5 +1,10 @@
  // https://hypertriangle.com/~alex/delta-robot-tutorial/
-
+ // robot geometry
+ // (look at pics above for explanation)
+ const float e = 115.0;     // end effector
+ const float f = 457.3;     // base
+ const float re = 232.0;
+ const float rf = 112.0;
  
  const float sqrt3 = sqrt(3.0);
  const float pi = 3.141592653;    // PI
@@ -58,7 +63,7 @@
      y0 = (a2*z0 + b2)/dnm;
      return 0;
  }
- 
+  
  // inverse kinematics
  // helper functions, calculates angle theta1 (for YZ-pane)
  int delta_calcAngleYZ(float x0, float y0, float z0, float &theta) {
