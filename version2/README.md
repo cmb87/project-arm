@@ -5,4 +5,4 @@ https://forum.arduino.cc/t/stepper-not-moving-using-grbl-and-cnc-shield/866196/2
 https://www.youtube.com/watch?v=rgAe1eVj9fw
 
 
-![alt text](cncshield.png)
+![alt text](./cncshield.png)
