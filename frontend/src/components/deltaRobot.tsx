@@ -1,6 +1,12 @@
 
 // https://hypertriangle.com/~alex/delta-robot-tutorial/
 
+export interface IXCinematic {
+  base: number[][][]
+  endeffector: number[][][]
+  joints: number[][][]
+}
+
 
 export class DeltaRobot {
 
@@ -19,7 +25,14 @@ export class DeltaRobot {
     private  cos120: number = -0.5;    
     private  tan60: number = this.sqrt3;
     private  sin30: number = 0.5;
+    private  cos30: number = 0.5*this.sqrt3;
     private  tan30: number = 1/this.sqrt3;
+
+    private xe: number[] = [0,0,0];
+    private jointStates: number[] = [0,0.0,0];
+
+    // Just for plotting
+    private xCinematic: IXCinematic = {base: [], endeffector: [], joints: []}
 
     // -----------------------------------------------
     constructor(e:number, f:number, re:number, rf:number, xoff: number = 0, yoff: number = 0, zoff: number = 0) {
@@ -31,13 +44,9 @@ export class DeltaRobot {
       this.xoff = xoff;
       this.yoff = yoff;
       this.zoff = zoff;
-      console.log("robot active")
+      console.log("New Robot created")
     }
 
-    // -----------------------------------------------
-    public getOrigin() {
-      return {x1: [this.xoff,this.yoff,this.zoff]}
-    }
 
     // -----------------------------------------------
     public forwardKinematic(theta1: number, theta2: number, theta3: number) {
@@ -84,24 +93,27 @@ export class DeltaRobot {
       const d: number = b*b - 4.0*a*c;
       if (d < 0) return -1; // non-existing point
   
-      const z0: number = -0.5*(b+Math.sqrt(d))/a;
-      const x0: number = (a1*z0 + b1)/dnm;
-      const y0: number = (a2*z0 + b2)/dnm;
+      const ze: number = -0.5*(b+Math.sqrt(d))/a;
+      const xe: number = (a1*ze + b1)/dnm;
+      const ye: number = (a2*ze + b2)/dnm;
 
+      // Store internally
+      this.xe = [xe, ye, ze]
+      this.jointStates = [theta1, theta2, theta3]
 
-      return {status: 0, x0: [x0+this.xoff, y0+this.yoff, z0+this.zoff]}
+      return {status: 0, x: [xe+this.xoff, ye+this.yoff, ze+this.zoff]}
     }
 
     // -----------------------------------------------
-    private delta_calcAngleYZ(x0: number, y0: number, z0: number) {
+    private delta_calcAngleYZ(xe: number, ye: number, ze: number) {
 
       let theta: number = 0.0;
 
       const y1: number = -0.5 * 0.57735 * this.f; // f/2 * tg 30
-      y0 -= 0.5 * 0.57735 * this.e;    // shift center to edge
+      ye -= 0.5 * 0.57735 * this.e;    // shift center to edge
       // z = a + b*y
-      const a: number = (x0*x0 + y0*y0 + z0*z0 +this.rf*this.rf - this.re*this.re - y1*y1)/(2*z0);
-      const b: number = (y1-y0)/z0;
+      const a: number = (xe*xe + ye*ye + ze*ze +this.rf*this.rf - this.re*this.re - y1*y1)/(2*ze);
+      const b: number = (y1-ye)/ze;
       // discriminant
       const d: number = -(a+b*y1)*(a+b*y1)+this.rf*(b*b*this.rf+this.rf); 
 
@@ -113,6 +125,7 @@ export class DeltaRobot {
 
       return {status: 0, theta: theta}
     }
+
     // -----------------------------------------------
     public inverseKinematic(x0: number, y0: number, z0: number) {
 
@@ -120,7 +133,6 @@ export class DeltaRobot {
       y0 = y0 - this.yoff;
       z0 = z0 - this.zoff;
 
-      
 
       const res1 = this.delta_calcAngleYZ(x0, y0, z0);
       const res2 = this.delta_calcAngleYZ(x0*this.cos120 + y0*this.sin120, y0*this.cos120-x0*this.sin120, z0);
@@ -129,6 +141,189 @@ export class DeltaRobot {
       return {status: res1.status+res2.status+res3.status, jointAngles: [res1.theta, res2.theta, res3.theta]}
     }
 
+
+    // -----------------------------------------------
+    public getOrigin() {
+      return {x1: [this.xoff,this.yoff,this.zoff]}
+    }
+
+    // -----------------------------------------------
+    public calculateGeometry() {
+      // calculate the position of all robot joints. Expects forwardKinematics to be run prior to execution
+
+      
+      const [theta3, theta2, theta1] = this.jointStates;
+      const [xe, ye, ze] = this.xe;
+
+      const k: number = this.f*Math.sqrt(3/4);
+      const b: number = this.f/2*this.tan30;
+
+      const ke: number = this.e*Math.sqrt(3/4);
+      const be: number = this.e/2*this.tan30;
+
+      
+      // Static platform
+      const xp1: number[] = [ this.f/2, -b, 0]
+      const xp2: number[] = [-this.f/2, -b, 0]
+      const xp3: number[] = [0, this.f/2*this.tan60 -b, 0]
+
+      // Biceps Plattform
+      const xf1: number[] = [ this.f/2-k*this.cos30, -b + k*this.sin30,0 ]
+      const xf2: number[] = [-this.f/2+k*this.cos30, -b + k*this.sin30,0]
+      const xf3: number[] = [0, -b, 0]
+
+      // Biceps
+      const xrf1: number[] = [
+        xf1[0] - this.rf*this.cos30*Math.cos(theta1),
+        xf1[1] + this.rf*this.sin30*Math.cos(theta1),
+        xf1[2] - this.rf*Math.sin(theta1)
+      ]
+      const xrf2: number[] = [
+        xf2[0] + this.rf*this.cos30*Math.cos(theta2),
+        xf2[1] + this.rf*this.sin30*Math.cos(theta2),
+        xf2[2] - this.rf*Math.sin(theta2)
+      ]
+      const xrf3: number[] = [
+        xf3[0],
+        xf3[1] - this.rf*Math.cos(theta3) ,
+        xf3[2] - this.rf*Math.sin(theta3) ,
+      ]
+
+      // Endeffector Platform
+      const xep1: number[] = [ xe + this.e/2, ye -be, ze ]
+      const xep2: number[] = [ xe - this.e/2, ye -be, ze ]
+      const xep3: number[] = [ xe, ye + this.e/2*this.tan60 -be,  ze]
+
+
+      // const xp1: number[] = [ this.f/2, -b, 0]
+      // const xp2: number[] = [-this.f/2, -b, 0]
+      // const xp3: number[] = [0, this.f/2*this.tan60 -b, 0]
+      
+      // Elbow
+      const xe1: number[] = [
+        xe + this.e/2-ke*this.cos30,
+        ye -be + ke*this.sin30,
+        ze 
+      ]
+      const xe2: number[] = [
+        xe + -this.e/2+ke*this.cos30,
+        ye -be + ke*this.sin30,
+        ze
+      ]
+      const xe3: number[] = [
+        xe,
+        ye -  be,
+        ze
+      ]
+
+      this.xCinematic = {
+        base: [[xp1, xp2, xp3, xp1]],
+        endeffector: [[xep1, xep2, xep3, xep1]],
+        joints: [
+          [xf1, xrf1],
+          [xf2, xrf2],
+          [xf3, xrf3],
+          [xrf1, xe1],
+          [xrf2, xe2],
+          [xrf3, xe3]
+        ]
+      }
+    }
+
+    // -----------------------------------------------
+    public plot(ctx: CanvasRenderingContext2D, iw: number, ih: number, xaxis: number=0, yaxis: number= 2) {
+
+      
+      const component: string[] = ["base", "endeffector", "joints"];
+      const xoff = [this.xoff, this.yoff, this.zoff]
+      const colors = {
+        base: "rgba(0, 0, 255, 0.6)",
+        endeffector: "rgba(255, 0, 0, 0.6)",
+        joints: "rgba(155, 155, 155, 0.6)"
+      }
+
+      // -----------------------------------------
+      ctx.lineWidth = 3;
+      ctx.setLineDash([5, 15]);
+      ctx.strokeStyle = "rgba(0, 0, 0, 0.4)"
+      ctx.beginPath();
+      ctx.moveTo(
+        Math.floor(
+          (this.xe[xaxis] + xoff[xaxis])*iw  
+        ),
+        0
+      );
+      ctx.lineTo(
+        Math.floor(
+          (this.xe[xaxis] + xoff[xaxis])*iw
+        ),
+        ih
+      );
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(
+        0,
+        Math.floor(
+          (this.xe[yaxis] + xoff[xaxis])*ih  
+        ),
+      );
+      ctx.lineTo(
+        iw,
+        Math.floor(
+          (this.xe[yaxis] + xoff[xaxis])*ih  
+        )
+      );
+      ctx.stroke();
+
+      // -----------------------------------------
+      ctx.fillStyle = "rgba(0, 0, 0, 1.0)";
+      ctx.setLineDash([]);
+      ctx.lineWidth = 10;
+
+      for (var c = 0; c < component.length; c++) {
+        ctx.strokeStyle = colors[component[c] as keyof typeof colors];  
+        const x = this.xCinematic[component[c] as keyof typeof this.xCinematic]
+        
+        for (var i = 0; i < x.length; i++) {
+          for (var j = 0; j < x[i].length-1; j++) {
+
+            ctx.beginPath();
+            ctx.moveTo(
+              Math.floor(
+                (x[i][j][xaxis] + xoff[xaxis])*iw  
+              ),
+              Math.floor(
+                (x[i][j][yaxis] + xoff[yaxis])*ih
+              )
+            );
+            ctx.lineTo(
+              Math.floor(
+                (x[i][j+1][xaxis] + xoff[xaxis])*iw
+              ),
+              Math.floor(
+                (x[i][j+1][yaxis] + xoff[yaxis])*ih
+              )
+            );
+
+            ctx.fillRect(
+              Math.floor((x[i][j][xaxis] + xoff[xaxis])*iw )-5,
+              Math.floor((x[i][j][yaxis] + xoff[yaxis])*ih )-5,
+              10,10
+            );
+            ctx.fillRect(
+              Math.floor((x[i][j+1][xaxis] + xoff[xaxis])*iw )-5,
+              Math.floor((x[i][j+1][yaxis] + xoff[yaxis])*ih )-5,
+              10,10
+            );
+            
+            ctx.stroke();
+          }
+        } 
+      }
+
+    }
+    
 
     
 }
