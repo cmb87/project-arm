@@ -11,7 +11,7 @@ import { DeltaRobot } from '../components/deltaRobot';
 
 const r = new DeltaRobot(0.115, 0.357, 0.332, 0.132, 0.5, 0.5, 0.5)
 
-const NMAX: number = 100;
+const NMAX: number = 200;
 
 
 export default function Home() {
@@ -58,6 +58,10 @@ export default function Home() {
 
       <Heading title='Manipulator'/>
 
+      <div className=" p-5">
+        <PlotTimeseries data={thetaTs} update={update}/>
+      </div>
+
       <div className="grid grid-cols-2 gap-4 w-1/2">
       {/* ===================================================================== */}
         <div className="border border-gray-300 rounded-xl">
@@ -70,9 +74,7 @@ export default function Home() {
           <PlotRobot robot={robot} xaxis={0} yaxis={1} xcursor={xcursor} setXcursor={setXcursor} update={update}/>
         </div>
 
-        <div className=" p-5">
-          <PlotTimeseries data={thetaTs} update={update}/>
-        </div>
+
       </div>
     </div>
   )

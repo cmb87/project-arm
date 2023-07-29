@@ -23,7 +23,7 @@ interface IScatterPlot {
 export default function ScatterPlotGeneric({ update, data }:IScatterPlot) {
   const [view, setView] = useState<View>();
   const width = "container"
-  const height = 400
+  const height = 200
 
   useEffect(() => {
     function updateGraph() {
@@ -59,6 +59,7 @@ export default function ScatterPlotGeneric({ update, data }:IScatterPlot) {
         "field": `t`,
         "type": "temporal",
         "title": "Time",
+        //"timeUnit": "seconds",
       },
       "y": {
         "field": `theta`,
