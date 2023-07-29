@@ -15,10 +15,11 @@ interface IPlotRobot {
     xcursor: number[]
     setXcursor: Function
     update: boolean
+    waypointSetTrigger: Function
 }
 
 
-export default function PlotRobot({robot, xaxis, yaxis, xcursor, setXcursor, update}: IPlotRobot) {
+export default function PlotRobot({robot, xaxis, yaxis, xcursor, setXcursor, update, waypointSetTrigger}: IPlotRobot) {
 
   //e:number, f:number, re:number, rf:number, xoff: number = 0, yoff: number = 0, zoff: number = 0
   //const robot = // e,f,re,rf
@@ -56,8 +57,6 @@ export default function PlotRobot({robot, xaxis, yaxis, xcursor, setXcursor, upd
     const iw = rect.width;
 
 
-    const x1 = robot.getOrigin();
-
     if (ctx) {
       ctx.canvas.width = iw;
       ctx.canvas.height = ih;
@@ -68,6 +67,7 @@ export default function PlotRobot({robot, xaxis, yaxis, xcursor, setXcursor, upd
       ctx.fillStyle = "rgba(255, 0, 0, 1.0)";
       ctx.strokeStyle = "rgba(0, 153, 255, 1.0)";
 
+      robot.trajectory.plot(ctx, iw, ih, xaxis, yaxis);
       robot.plot(ctx, iw, ih, xaxis, yaxis);
 
     }
@@ -87,12 +87,16 @@ export default function PlotRobot({robot, xaxis, yaxis, xcursor, setXcursor, upd
   // --------------------- GetMouseCursor -------------------
   const hoverCb = (ex:number,ey:number, btn: number) => {
     
-    const m = _getRelativeMousePos(ex, ey)
-    let x = [0,0.5,0.16];
-    x[xaxis] = m!.x;
-    x[yaxis] = m!.y;
+    if (btn === 0) {
+        const m = _getRelativeMousePos(ex, ey)
+        let x = xcursor;
+        x[xaxis] = m!.x;
+        x[yaxis] = m!.y;
+        setXcursor([...x]);
+        return
+    } 
 
-    setXcursor(x);
+    waypointSetTrigger();
     
   } 
 
@@ -106,7 +110,7 @@ export default function PlotRobot({robot, xaxis, yaxis, xcursor, setXcursor, upd
           onMouseDown={(e) => hoverCb(e.clientX, e.clientY, e.button)}
           //onMouseUp={(e) => clickBtnUpCb(e.clientX, e.clientY, e.button)}
           //onMouseLeave={(e) => {setAnnotationSelected(null)}}
-          onMouseMove={(e) => hoverCb(e.clientX, e.clientY, e.button)}
+          //onMouseMove={(e) => hoverCb(e.clientX, e.clientY, e.button)}
           className="w-full"
         />
 

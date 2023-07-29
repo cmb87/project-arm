@@ -1,3 +1,5 @@
+import { Trajectory } from "./trajectory";
+
 
 // https://hypertriangle.com/~alex/delta-robot-tutorial/
 
@@ -34,6 +36,8 @@ export class DeltaRobot {
     // Just for plotting
     private xCinematic: IXCinematic = {base: [], endeffector: [], joints: []}
 
+    public trajectory: Trajectory
+
     // -----------------------------------------------
     constructor(e:number, f:number, re:number, rf:number, xoff: number = 0, yoff: number = 0, zoff: number = 0) {
       this.e = e;     // end effector
@@ -44,6 +48,9 @@ export class DeltaRobot {
       this.xoff = xoff;
       this.yoff = yoff;
       this.zoff = zoff;
+
+      this.trajectory = new Trajectory();
+
       console.log("New Robot created")
     }
 
@@ -143,8 +150,13 @@ export class DeltaRobot {
 
 
     // -----------------------------------------------
-    public getOrigin() {
-      return {x1: [this.xoff,this.yoff,this.zoff]}
+    public getCurrentJointStates() {
+      return this.jointStates
+    }
+
+    // -----------------------------------------------
+    public getCurrentEndEffectorPosition() {
+      return [this.xe[0]+this.xoff, this.xe[1]+this.yoff, this.xe[2]+this.zoff]
     }
 
     // -----------------------------------------------
