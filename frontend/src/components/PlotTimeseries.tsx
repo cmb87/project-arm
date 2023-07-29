@@ -68,20 +68,20 @@ export default function ScatterPlotGeneric({ update, data }:IScatterPlot) {
       },
       "color": {"field": "id", "type": "nominal"}
     },
-    "selection": {
-      "grid_x": {
-        "type": "interval",
-        "bind": "scales",
-        "zoom": "wheel![event.ctrlKey]",
-        "encodings": ["x"]
-      },
-      "grid_y": {
-        "type": "interval",
-        "bind": "scales",
-        "zoom": "wheel![!event.ctrlKey]",
-        "encodings": ["y"]
-      }
-    },
+    // "selection": {
+    //   "grid_x": {
+    //     "type": "interval",
+    //     "bind": "scales",
+    //     "zoom": "wheel![event.ctrlKey]",
+    //     "encodings": ["x"]
+    //   },
+    //   "grid_y": {
+    //     "type": "interval",
+    //     "bind": "scales",
+    //     "zoom": "wheel![!event.ctrlKey]",
+    //     "encodings": ["y"]
+    //   }
+    // },
     "config": {
       "axis": {"grid": true, "tickBand": "extent"}
     }

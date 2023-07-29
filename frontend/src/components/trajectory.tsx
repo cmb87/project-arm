@@ -48,8 +48,12 @@ export class Trajectory {
     public getJointTarget() {
       const t = new Date().getTime()/1000 - this.tstart;
       
-      this.traj.filter((tr:ITrajectoryPoint) => tr.eta<=t)[0]
+      const trCurr = this.traj.filter((tr:ITrajectoryPoint) => tr.eta<=t)[0]
 
+      // Loop over each dimension and calculate the polynomial a0 + a1*t + a2*t**2 + a3*t**3
+      const xtarget = trCurr.xt.map((x:number,idx:number) => trCurr.parameters.reduce((sum:number, a:number[], idx:number) => (sum + a[idx])*Math.pow(t, idx), 0))
+
+      return xtarget
     }
 
 
