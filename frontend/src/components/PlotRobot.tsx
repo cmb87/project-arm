@@ -70,6 +70,14 @@ export default function PlotRobot({robot, xaxis, yaxis, xcursor, setXcursor, upd
       robot.trajectory.plot(ctx, iw, ih, xaxis, yaxis);
       robot.plot(ctx, iw, ih, xaxis, yaxis);
 
+      ctx.fillStyle = "rgba(255, 0, 255, 1.0)";
+      ctx.fillRect(
+        Math.floor((xcursor[xaxis] )*iw )-5,
+        Math.floor((xcursor[yaxis])*ih )-5,
+        10,10
+      );
+    
+      ctx.stroke();
     }
   }
 
