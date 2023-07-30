@@ -14,7 +14,7 @@ interface IPlotRobot {
     yaxis: number
     xcursor: number[]
     setXcursor: Function
-    update: boolean
+    update: boolean | number
     waypointSetTrigger: Function
 }
 
@@ -35,7 +35,8 @@ export default function PlotRobot({robot, xaxis, yaxis, xcursor, setXcursor, upd
       // Get Threshold
       canvas.current!.oncontextmenu = function(e) { e.preventDefault(); e.stopPropagation(); }
       const ctx = canvas.current.getContext('2d');
-
+    
+      console.log("Plotting....")
       // ---------------------
       // Clear
       ctx!.clearRect(0, 0, ctx!.canvas.width,  ctx!.canvas.height);
@@ -45,10 +46,7 @@ export default function PlotRobot({robot, xaxis, yaxis, xcursor, setXcursor, upd
     }
   }, [update])
 
-
-
-
-  // --------------------- Animation -------------------
+  // --------------------- Static Plotting -------------------
   function plot() {
 
     const ctx = canvas.current?.getContext('2d')
@@ -109,7 +107,7 @@ export default function PlotRobot({robot, xaxis, yaxis, xcursor, setXcursor, upd
   } 
 
   return (
-
+    <>
       <canvas 
           ref={canvas}
           width={300}
@@ -121,7 +119,7 @@ export default function PlotRobot({robot, xaxis, yaxis, xcursor, setXcursor, upd
           //onMouseMove={(e) => hoverCb(e.clientX, e.clientY, e.button)}
           className="w-full"
         />
-
+   </>
   )
 }
 

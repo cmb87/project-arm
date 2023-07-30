@@ -13,7 +13,7 @@ import Button from './Button';
 
 // ----------------------------------------------
 interface IScatterPlot {
-  update:boolean
+  update:boolean | number
   data: any
 }
 

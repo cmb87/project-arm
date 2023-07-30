@@ -33,6 +33,8 @@ export class DeltaRobot {
     private xe: number[] = [0,0,0];
     private jointStates: number[] = [0,0.0,0];
 
+    public update: boolean = false;
+
     // Just for plotting
     private xCinematic: IXCinematic = {base: [], endeffector: [], joints: []}
 
@@ -240,6 +242,8 @@ export class DeltaRobot {
           [xrf3, xe3]
         ]
       }
+      this.update = !this.update;
+      
     }
 
     // -----------------------------------------------

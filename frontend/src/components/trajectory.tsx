@@ -1,7 +1,8 @@
 interface ITrajectoryPoint {
     xt: number[]
     parameters: number[][]
-    eta: number
+    t0: number
+    t1: number
     pos: number[]
 }
 
@@ -10,38 +11,33 @@ export class Trajectory {
   
     private tstart: number = 0;
     private traj: ITrajectoryPoint[] = []
+    private njoints: number = 0;
 
     // -----------------------------------------------
     constructor() {
       // Assign dummy values
     }
-
+    // -----------------------------------------------
+    public getTotalTime() {
+        return this.traj[this.traj.length-1].t1
+    }
     // -----------------------------------------------
     public addPoints(xf: number[], pos: number[], Tf: number) {
 
-      // If Trajectory is still empty
-      if (this.traj.length === 0) {
-        this.traj.push({
-            xt: xf, 
-            parameters: [[0]], 
-            eta: 0,
-            pos: pos
-        }) 
-        return
-      }
-
       // Add a new point, Tf time for move in Seconds
+      const x0 = [...this.traj[this.traj.length-1].xt];
       this.traj.push({
         xt: xf, 
-        parameters: Trajectory._calculate(this.traj[this.traj.length-1].xt, xf, Tf),
-        eta: this.traj[this.traj.length-1].eta+Tf,
-        pos: pos
+        parameters: Trajectory._calculate(xf,x0, Tf),
+        pos: pos,
+        t1: this.traj[this.traj.length-1].t1+Tf,
+        t0: this.traj[this.traj.length-1].t1
        });
 
     };
 
     // -----------------------------------------------
-    private static _calculate(x0: number[], xf: number[], Tf: number) {
+    private static _calculate(xf: number[], x0: number[], Tf: number) {
         const a0 =  x0;
         const a1 =  x0.map((x:number, idx:number) =>  0.0);
         const a2 =  x0.map((x:number, idx:number) =>  3.0/(Tf*Tf)*(xf[idx]-x0[idx])); 
@@ -50,25 +46,39 @@ export class Trajectory {
     };
 
     // -----------------------------------------------
-    public init(x0:number[]) {
+    public init(x0:number[], pos0: number[]) {
         this.traj = []; // delete everything
+        this.traj.push({
+            xt: x0, 
+            parameters: [[0]], 
+            t1: 0,
+            t0: 0,
+            pos: pos0
+        })
+        this.tstart = 0;
+        this.njoints = x0.length;
     }
 
-    // -----------------------------------------------
-    public start() {
-      //  time stamp is the number of milliseconds that have passed since January 1, 1970
-      this.tstart = new Date().getTime()/1000; // in seconds
-    }
 
     // -----------------------------------------------
-    public getJointTarget() {
+    public getJointTarget(t:number) {
 
-      const t = new Date().getTime()/1000 - this.tstart;
-      
-      const trCurr = this.traj.filter((tr:ITrajectoryPoint) => tr.eta<=t)[0]
 
+
+      const trCurr = this.traj.filter((tr:ITrajectoryPoint) => tr.t1>(t-this.tstart))[0]
       // Loop over each dimension and calculate the polynomial a0 + a1*t + a2*t**2 + a3*t**3
-      const xtarget = trCurr.xt.map((x:number,idx:number) => trCurr.parameters.reduce((sum:number, a:number[], idx:number) => (sum + a[idx])*Math.pow(t, idx), 0))
+      
+      const dt = (t-this.tstart)-trCurr.t0;
+
+      var xtarget = new Array(this.njoints);
+      
+
+      for (var i=0 ; i<this.njoints; i++ ) {
+        xtarget[i] = trCurr.parameters[0][i] + trCurr.parameters[1][i]*dt + trCurr.parameters[2][i]*dt*dt + trCurr.parameters[3][i]*dt*dt*dt; 
+      }
+      
+      //const xtarget = trCurr.parameters.reduce((sum:number, arow:number[],idx:number) => arow.map((a:number) => a*Math.pow((t-this.tstart), idx), 0)
+      //trCurr.parameters.reduce((sum:number, a:number[], idx:number) => (sum + a[idx1])*Math.pow((t-this.tstart), idx), 0))
 
       return xtarget
     }
