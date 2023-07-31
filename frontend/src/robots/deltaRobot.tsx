@@ -1,5 +1,18 @@
 import { Trajectory } from "./trajectory";
+import { Vector, Model, DenseLayer, ScaleLayer } from "./vector";
 
+
+
+
+const model = new Model(
+  {inputUnits:4, layers:[
+    new ScaleLayer({scale: [1.0,1.0,1.0, 1/3.14]}),
+    new DenseLayer({units: 100, activation: "relu"}),
+    new DenseLayer({units: 3, activation: "relu"}),
+  ], name:"model"
+})
+
+model.summary()
 
 // https://hypertriangle.com/~alex/delta-robot-tutorial/
 
@@ -31,9 +44,11 @@ export class DeltaRobot {
     private  tan30: number = 1/this.sqrt3;
 
     private xe: number[] = [0,0,0];
-    private jointStates: number[] = [0,0.0,0];
+    private jointStates: number[] = [0,0,0];
 
-    public update: boolean = false;
+    // For plotting joint state history
+    public jointStatesHist: {t: number, theta: number, id: string}[] = [];
+    public maxHistSteps: number= 300
 
     // Just for plotting
     private xCinematic: IXCinematic = {base: [], endeffector: [], joints: []}
@@ -153,12 +168,44 @@ export class DeltaRobot {
 
     // -----------------------------------------------
     public getCurrentJointStates() {
-      return this.jointStates
+      return this.jointStates.map((x:number) => x/this.pi*180)
     }
 
     // -----------------------------------------------
     public getCurrentEndEffectorPosition() {
       return [this.xe[0]+this.xoff, this.xe[1]+this.yoff, this.xe[2]+this.zoff]
+    }
+    // -----------------------------------------------
+    public async run(dt: number=100, updateTrigger: Function = ()=>{}) {
+
+      this.trajectory.start();
+  
+      while (true) {
+        
+        const t = new Date().getTime();
+  
+        if (t>=this.trajectory.getEndTime()) break;
+  
+        // Get target state
+        const jointStatesTarget = this.trajectory.getJointTarget(t);
+  
+        // Run forward kinematic
+        this.forwardKinematic(jointStatesTarget[0], jointStatesTarget[1], jointStatesTarget[2]);
+
+        // For cinematic
+        this.calculateGeometry();
+        
+        // Remove older entries
+        if (this.jointStatesHist.length > 3*this.maxHistSteps) this.jointStatesHist.shift();this.jointStatesHist.shift();this.jointStatesHist.shift();
+        
+        jointStatesTarget.forEach((x:number, idx:number) => this.jointStatesHist.push({t: t, theta: x, id: `theta_${idx}`}))  
+
+        updateTrigger(t);
+  
+        await new Promise(r => setTimeout(r, Math.round(dt)));
+        
+      }
+
     }
 
     // -----------------------------------------------
@@ -242,8 +289,7 @@ export class DeltaRobot {
           [xrf3, xe3]
         ]
       }
-      this.update = !this.update;
-      
+
     }
 
     // -----------------------------------------------
@@ -253,9 +299,9 @@ export class DeltaRobot {
       const component: string[] = ["base", "endeffector", "joints"];
       const xoff = [this.xoff, this.yoff, this.zoff]
       const colors = {
-        base: "rgba(0, 0, 255, 0.6)",
-        endeffector: "rgba(255, 0, 0, 0.6)",
-        joints: "rgba(155, 155, 155, 0.6)"
+        base: "rgba(10, 10, 10, 0.8)",
+        endeffector: "rgba(0, 0, 0, 0.8)",
+        joints: "rgba(165, 165, 165, 0.8)"
       }
 
       // -----------------------------------------

@@ -4,7 +4,7 @@ import InputFieldSlim from '../components/InputFieldSlim';
 import Heading from '../components/Heading';
 import Button from '../components/Button';
 
-import { DeltaRobot } from '../components/deltaRobot';
+import { DeltaRobot } from '../robots/deltaRobot';
 
 
 
@@ -36,7 +36,6 @@ export default function PlotRobot({robot, xaxis, yaxis, xcursor, setXcursor, upd
       canvas.current!.oncontextmenu = function(e) { e.preventDefault(); e.stopPropagation(); }
       const ctx = canvas.current.getContext('2d');
     
-      console.log("Plotting....")
       // ---------------------
       // Clear
       ctx!.clearRect(0, 0, ctx!.canvas.width,  ctx!.canvas.height);

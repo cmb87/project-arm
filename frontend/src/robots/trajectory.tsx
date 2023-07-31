@@ -64,7 +64,7 @@ export class Trajectory {
     }
 
     // -----------------------------------------------
-    public run() {
+    public start() {
        this.tstart = new Date().getTime();
        console.log(this.traj)
     }

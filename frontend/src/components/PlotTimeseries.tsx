@@ -9,10 +9,11 @@ import * as vega from 'vega';
 
 import { InputFieldSelectSlim } from './InputFieldSlim';
 import Button from './Button';
-
+import { DeltaRobot } from '../robots/deltaRobot';
 
 // ----------------------------------------------
 interface IScatterPlot {
+  robot: DeltaRobot | undefined
   update:boolean | number
   data: any
 }
@@ -20,25 +21,27 @@ interface IScatterPlot {
 // https://www.colamda.de/blog/2020-12-03-React-Vega-Lifecycle/
 // https://vega.github.io/vega-lite/tutorials/streaming.html
 
-export default function ScatterPlotGeneric({ update, data }:IScatterPlot) {
+export default function ScatterPlotGeneric({robot, update }:IScatterPlot) {
   const [view, setView] = useState<View>();
   const width = "container"
   const height = 200
 
   useEffect(() => {
-    function updateGraph() {
+    if (!robot && !view) return
 
+    const updateGraph = () => {
       const cs = vega
         .changeset()
-        .insert(data)
+        .insert(robot!.jointStatesHist)
         .remove(function (t:any) {
-            return t.t < data[0].t;
+            return t.t < robot!.jointStatesHist[0].t;
           });
 
       view!.change('table', cs).run();
     }
 
-    if (view) updateGraph();
+
+    updateGraph();
 
   }, [update]);
 
@@ -93,7 +96,7 @@ export default function ScatterPlotGeneric({ update, data }:IScatterPlot) {
 
 
     <div className="flex flex-col">
-      <Vega data={{table:data}}  spec={specLinePlot} actions={true} onNewView={(view:any) => setView(view)} renderer={'svg'}/>
+      { robot && <Vega data={{table:robot!.jointStatesHist}}  spec={specLinePlot} actions={true} onNewView={(view:any) => setView(view)} renderer={'svg'}/>}
     </div>
 
 

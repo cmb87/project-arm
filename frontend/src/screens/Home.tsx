@@ -7,7 +7,7 @@ import Button from '../components/Button';
 import PlotRobot from '../components/PlotRobot';
 import PlotTimeseries from '../components/PlotTimeseries';
 
-import { DeltaRobot } from '../components/deltaRobot';
+import { DeltaRobot } from '../robots/deltaRobot';
 
 
 
@@ -57,29 +57,6 @@ export default function Home() {
     setUpdate(!update);
 
 
-    // if (!robot) return
-    // const thetaUpdate = robot!.inverseKinematic(xcursor[0], xcursor[1], xcursor[2]);
-    // if (thetaUpdate.status !== 0 ) return 
-
-
-    // robot!.forwardKinematic(
-    //   thetaUpdate.jointAngles[0],
-    //   thetaUpdate.jointAngles[1],
-    //   thetaUpdate.jointAngles[2]
-    // );
-    // robot!.calculateGeometry();
-    // setUpdate(!update);
-
-    // // Remove old entries
-    // if (thetaTs.length > 3*NMAX) thetaTs.shift();thetaTs.shift();thetaTs.shift();
-
-    // // Add new
-    // const t = new Date().getTime();
-    // thetaTs.push({t: t, theta: thetaUpdate.jointAngles[0], id: 1})
-    // thetaTs.push({t: t, theta: thetaUpdate.jointAngles[1], id: 2})
-    // thetaTs.push({t: t, theta: thetaUpdate.jointAngles[2], id: 3})
-      
- 
   }, [xcursor])
 
   // --------------------- Add waypoint -------------------
@@ -88,49 +65,35 @@ export default function Home() {
     if (!robot) return
     const thetaCursor = robot!.inverseKinematic(xcursor[0], xcursor[1], xcursor[2]);
     if (thetaCursor.status !== 0 ) return 
-    robot?.trajectory.addPoints(thetaCursor.jointAngles, [...xcursor], 0.5);
+    robot?.trajectory.addPoints(thetaCursor.jointAngles, [...xcursor], 1000);
     setUpdate(!update);
 
   }, [waypoint])
 
   // --------------------- ------------------
-
-  const simulate = async (dt: number=0.1) => {
+  // Start a simulation
+  const simulate = async (dt: number=100) => {
     if (simlating) return
     if (!robot) return
 
     setSimulating(true);
 
-    const nmax = Math.ceil(robot.trajectory.getTotalTime()/dt);
-
-    console.log("Running Simulation", nmax)
-
-    for (var n = 0; n < nmax; n++) {
-
-      const t = n*dt;
-      const theta = robot.trajectory.getJointTarget(t);
-
-      //console.log(theta);
-      robot.forwardKinematic(theta[0], theta[1], theta[2]);
-      robot.calculateGeometry();
-
-      // Remove old entries
-      if (thetaTs.length > 3*NMAX) thetaTs.shift();thetaTs.shift();thetaTs.shift();
-
-      thetaTs.push({t: t, theta: theta[0], id: 1})
-      thetaTs.push({t: t, theta: theta[1], id: 2})
-      thetaTs.push({t: t, theta: theta[2], id: 3})
-
-      setUpdate(n);
-
-      await new Promise(r => setTimeout(r, Math.round(dt*1000)));
-      
-    }
-
+    await robot.run(100, setUpdate)   
+    
     setSimulating(false);
-    console.log("Done")
-
   }
+
+
+  // --------------------- ------------------
+  // reset
+  const reset = async (dt: number=100) => {
+    if (simlating) return
+    if (!robot) return
+
+    robot.trajectory.init(robot.getCurrentJointStates(), robot.getCurrentEndEffectorPosition());
+    setUpdate(new Date().getTime());
+  }
+
 
   // --------------------- ------------------
   return (
@@ -139,7 +102,7 @@ export default function Home() {
       <Heading title='Manipulator'/>
 
       <div className="border border-gray-300 rounded-xl p-5">
-        <PlotTimeseries data={thetaTs} update={update}/>
+        <PlotTimeseries robot={robot} data={thetaTs} update={update}/>
       </div>
 
       <div className="grid grid-cols-2 gap-4 w-1/2">
@@ -153,8 +116,9 @@ export default function Home() {
         <div className="border border-gray-300 rounded-xl">
           {robot &&<PlotRobot robot={robot} xaxis={0} yaxis={1} xcursor={xcursor} setXcursor={setXcursor} update={update} waypointSetTrigger={()=> setWaypoint(!waypoint)} />}
         </div>
-        <div className="border border-gray-300 rounded-xl">
+        <div className="border border-gray-300 rounded-xl p-5">
           <Button onClick={()=> simulate()} disabled={simlating} title='Start Simulation'></Button>
+          <Button onClick={()=> reset()} disabled={simlating} title='Reset'></Button>
         </div>
       </div>
     </div>
