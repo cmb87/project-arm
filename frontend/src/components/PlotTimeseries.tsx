@@ -10,10 +10,12 @@ import * as vega from 'vega';
 import { InputFieldSelectSlim } from './InputFieldSlim';
 import Button from './Button';
 import { DeltaRobot } from '../robots/deltaRobot';
+import { SerialRobot } from '../robots/serialRobot';
+
 
 // ----------------------------------------------
 interface IScatterPlot {
-  robot: DeltaRobot | undefined
+  robot: DeltaRobot | SerialRobot | undefined
   update:boolean | number
   data: any
 }

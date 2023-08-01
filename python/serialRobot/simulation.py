@@ -1,4 +1,4 @@
-import sys, os
+import sys, os, json
 import numpy as np
 import matplotlib.pyplot as plt
 import random
@@ -124,6 +124,24 @@ if __name__ == "__main__":
     # Assign DL model
     model = buildModel(m.nJoints)
     model.load_weights("robot.h5")
+
+    
+    weights = {}
+    for l in model.layers:
+
+        if len(l.weights) > 1:
+            weights[f"{l.name}_w"] = l.weights[0].numpy().T.tolist()
+            weights[f"{l.name}_b"] = l.weights[1].numpy().tolist()
+            #weights[f"{l.name}_activation"] = l.activation.
+    with open("weights.json", 'w') as f1:
+        f1.write(json.dumps(weights, indent=4))
+
+    #print(model.predict(np.asarray([[1.0,0.5,0.0]], dtype=np.float32))) # [[0.42042184 0.59557784 0.48245117]]
+    #print(model.summary())
+    #print(model.get_weights())
+
+    sys.exit()
+
     m.ikModel = model
 
     xt1 =  np.asarray([[0.0,0.8,0.0]])

@@ -1,20 +1,8 @@
 import { Trajectory } from "./trajectory";
-import { Vector, Model, DenseLayer, ScaleLayer } from "./vector";
+import { Vector } from "./vector";
 
 
 
-
-const model = new Model(
-  {inputUnits:4, layers:[
-    new ScaleLayer({scale: [1.0,1.0,1.0, 1/3.14]}),
-    new DenseLayer({units: 100, activation: "relu"}),
-    new DenseLayer({units: 3, activation: "relu"}),
-  ], name:"model"
-})
-
-model.summary()
-
-// https://hypertriangle.com/~alex/delta-robot-tutorial/
 
 export interface IXCinematic {
   base: number[][][]

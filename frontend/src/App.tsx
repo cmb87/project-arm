@@ -5,7 +5,8 @@ import { BsBugFill } from 'react-icons/bs';
 import './App.css';
 
 import Footer from './components/Footer';
-import Home from './screens/Home';
+import Delta from './screens/Delta';
+import Serial from './screens/Serial';
 import './App.css';
 
 
@@ -20,7 +21,7 @@ function App() {
 
       <Routes>
         <Route path="/" element={<Navigate replace to="/start"/>}/>
-        <Route path="start" element={<Home/>}/>
+        <Route path="start" element={<Delta/>}/>
         
 
         <Route path="*" element={
@@ -35,8 +36,8 @@ function App() {
                   {/* <RequestInterceptor> */}
                     <Routes>
                       
-                      <Route path="home" element={<Home/>}/>
-
+                      <Route path="delta" element={<Delta/>}/>
+                      <Route path="serial" element={<Serial/>}/>
 
                     </Routes>
                   {/* </RequestInterceptor> */}

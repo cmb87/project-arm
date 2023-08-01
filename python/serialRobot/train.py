@@ -29,7 +29,7 @@ class NormalizationLayer(tf.keras.Model):
 
         :type training: object
         """
-        norm = tf.constant([1.4, 1.4, PI], dtype=tf.float32)
+        norm = tf.constant([1.4, 1.4, 3.14159], dtype=tf.float32)
 
         return (x )/norm
 

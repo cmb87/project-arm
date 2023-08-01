@@ -16,6 +16,21 @@ export class Vector {
       return x.map((_:number,i:number) => x[i]*y[i])
     }
 
+    public static eye(ndim:number) {
+      return Array.from({length: ndim}, (x, i) => Array.from({length: ndim}, (x, j) => i === j ? 1 : 0))
+    }
+
+    public static tril(ndim:number, shift: number = 0) {
+        return Array.from({length: ndim}, (x, i) => Array.from({length: ndim}, (x, j) => i >= j+shift ? 1 : 0))
+    }
+
+    public static normalize(x:number[], xoff: number[], scale: number) {
+        return x.map((_:number,i:number) => x[i]/scale+xoff[i])
+    }
+
+    public static unnormalize(x:number[], xoff: number[], scale: number) {
+        return x.map((_:number,i:number) => (x[i]-xoff[i])*scale)
+    }
 
     public static activation(x:number[], activation: string = 'linear') {
         switch (activation) {
@@ -25,6 +40,10 @@ export class Vector {
                 return x.map((_:number,i:number) => Math.max(x[i],0.0))
             case 'tanh':
                 return x.map((_:number,i:number) => Math.tanh(x[i]))
+            case 'sin':
+                return x.map((_:number,i:number) => Math.sin(x[i]))
+            case 'cos':
+                return x.map((_:number,i:number) => Math.cos(x[i]))
             case 'sigmoid':
                 return x.map((_:number,i:number) => Math.tanh(x[i]))
             default:
@@ -113,8 +132,9 @@ export class DenseLayer extends Layer {
   // ----------------------------------
   public loadWeights(weights: any) {
     if (`${this.name}_w` in weights) {
-      console.assert(weights[`${this.name}_w`].length === this.units, `Loaded weights for ${this.name}_w don't match units` )
-      console.assert(weights[`${this.name}_w`][0].length === this.inputUnits, `Loaded weights for ${this.name}_w don't match input units` )
+    console.log(weights[`${this.name}_w`].length, weights[`${this.name}_w`][0].length)
+      console.assert(weights[`${this.name}_w`][0].length === this.inputUnits , `Loaded weights for ${this.name}_w don't match units ` )
+      console.assert(weights[`${this.name}_w`].length === this.units, `Loaded weights for ${this.name}_w don't match input units` )
       this.w = weights[`${this.name}_w`]
       console.log(`Weights loaded for ${this.name}_w`)
     }
@@ -169,8 +189,11 @@ export class Model {
       console.assert(x.length === this.inputUnits, `Input doesn't match input!`)
 
       var y = [...x];
+  
       for (let n = 0 ; n<this.layers.length ; n++) {
+        
         y = [...this.layers[n].call(y)];
+        
       }
 
       return y

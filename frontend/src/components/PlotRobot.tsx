@@ -5,11 +5,11 @@ import Heading from '../components/Heading';
 import Button from '../components/Button';
 
 import { DeltaRobot } from '../robots/deltaRobot';
-
+import { SerialRobot } from '../robots/serialRobot';
 
 
 interface IPlotRobot {
-    robot: DeltaRobot
+    robot: DeltaRobot | SerialRobot 
     xaxis: number
     yaxis: number
     xcursor: number[]
@@ -95,8 +95,8 @@ export default function PlotRobot({robot, xaxis, yaxis, xcursor, setXcursor, upd
     if (btn === 0) {
         const m = _getRelativeMousePos(ex, ey)
         let x = xcursor;
-        x[xaxis] = m!.x;
-        x[yaxis] = m!.y;
+        x[xaxis] = xaxis!==2 ? m!.x  : 1-m!.x;
+        x[yaxis] = xaxis!==2 ? m!.y  : 1-m!.y;
         setXcursor([...x]);
         return
     } 

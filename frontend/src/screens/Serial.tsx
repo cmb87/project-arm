@@ -7,20 +7,18 @@ import Button from '../components/Button';
 import PlotRobot from '../components/PlotRobot';
 import PlotTimeseries from '../components/PlotTimeseries';
 
-import { DeltaRobot } from '../robots/deltaRobot';
+import { SerialRobot } from '../robots/serialRobot';
 
 
 
-const NMAX: number = 200;
 
-
-export default function Home() {
+export default function Serial() {
 
   //e:number, f:number, re:number, rf:number, xoff: number = 0, yoff: number = 0, zoff: number = 0
   //const robot = // e,f,re,rf
 
   const navigate = useNavigate();
-  const [robot, setRobot] = useState<DeltaRobot>( )
+  const [robot, setRobot] = useState<SerialRobot>( )
   const [xcursor, setXcursor] = useState<number[]>([])
   const [update, setUpdate] = useState<boolean | number>(true)
   const [waypoint, setWaypoint] = useState(true)
@@ -32,16 +30,19 @@ export default function Home() {
   // --------------------- Build robot -------------------
   useEffect(() => {
 
-    const r = new DeltaRobot(0.115, 0.357, 0.332, 0.132, 0.5, 0.5, 0.5)
-    const x0 = r.forwardKinematic(0.0,0.0,0.0);
-    r.calculateGeometry();
 
-    if (x0 !== -1) {
-      r.trajectory.init([0.0,0.0,0.0], [...x0.x] );
+    //thetaMin = tf.constant([0, -PI, -PI/2], dtype=tf.float32)
+    //thetaMax = tf.constant([PI, 0,  PI/2], dtype=tf.float32)
+
+    const r = new SerialRobot([0.5,0.6,0.3], [0.5, 0.5, 0.5], 2.8)
+    const x0 = r.forwardKinematic([0,0,0,0]);
+
+    if (x0.status !== -1) {
+      r.trajectory.init([0.0,0.0,0.0,0.0], [...x0.x,0.0] );
       setXcursor(x0.x);
     }
 
-    console.log("New robot initialized")
+    console.log("New serial robot initialized")
     setRobot(r);
 
   }, [])
@@ -51,7 +52,7 @@ export default function Home() {
 
 
     if (!robot) return
-    const thetaCursor = robot!.inverseKinematic(xcursor[0], xcursor[1], xcursor[2]);
+    const thetaCursor = robot!.inverseKinematic([xcursor[0], xcursor[1], xcursor[2], 0.0]);
     if (thetaCursor.status !== 0 ) return 
 
     setUpdate(!update);
@@ -63,9 +64,10 @@ export default function Home() {
   useEffect(()=>{
 
     if (!robot) return
-    const thetaCursor = robot!.inverseKinematic(xcursor[0], xcursor[1], xcursor[2]);
+    const thetaCursor = robot!.inverseKinematic([xcursor[0], xcursor[1], xcursor[2], 0.0]);
+
     if (thetaCursor.status !== 0 ) return 
-    robot?.trajectory.addPoints(thetaCursor.jointAngles, [...xcursor], 1000);
+    robot?.trajectory.addPoints(thetaCursor.jointAngles, [...xcursor,0.0], 1000);
     setUpdate(!update);
 
   }, [waypoint])
