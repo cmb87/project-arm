@@ -136,7 +136,7 @@ if __name__ == "__main__":
     with open("weights.json", 'w') as f1:
         f1.write(json.dumps(weights, indent=4))
 
-    #print(model.predict(np.asarray([[1.0,0.5,0.0]], dtype=np.float32))) # [[0.42042184 0.59557784 0.48245117]]
+    print(model.predict(np.asarray([[1.4, 0, 0]], dtype=np.float32))) # [[0.42042184 0.59557784 0.48245117]]
     #print(model.summary())
     #print(model.get_weights())
 

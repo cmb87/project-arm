@@ -34,7 +34,7 @@ export default function Serial() {
     //thetaMin = tf.constant([0, -PI, -PI/2], dtype=tf.float32)
     //thetaMax = tf.constant([PI, 0,  PI/2], dtype=tf.float32)
 
-    const r = new SerialRobot([0.5,0.6,0.3], [0.5, 0.5, 0.5], 2.8)
+    const r = new SerialRobot([0.5,0.6,0.3], [0.5, 0.5, 0.2], 2.8)
     const x0 = r.forwardKinematic([0,0,0,0]);
 
     if (x0.status !== -1) {

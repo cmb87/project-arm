@@ -7,9 +7,11 @@ export class Vector {
       return A.map((arow: number[], i: number) => arow.reduce((sum:number, a:number, j:number) => sum + arow[j]*x[j],0) )
     }
 
-    public static add(x:number[], y: number[], substract:boolean=false) {
-      if (substract) return x.map((_:number,i:number) => x[i] - y[i])
+    public static add(x:number[], y: number[]) {
       return x.map((_:number,i:number) => x[i] + y[i])
+    }
+    public static substract(x:number[], y: number[]) {
+      return x.map((_:number,i:number) => x[i] - y[i])
     }
 
     public static multiply(x:number[], y: number[]) {
@@ -24,8 +26,11 @@ export class Vector {
         return Array.from({length: ndim}, (x, i) => Array.from({length: ndim}, (x, j) => i >= j+shift ? 1 : 0))
     }
 
-    public static normalize(x:number[], xoff: number[], scale: number) {
-        return x.map((_:number,i:number) => x[i]/scale+xoff[i])
+    public static normalize(x:number[], xoff: number[], scale: number, invertZ: boolean = false) {
+        if (!invertZ) return x.map((_:number,i:number) => x[i]/scale+xoff[i])
+        var xnorm = x.map((_:number,i:number) => x[i]/scale+xoff[i]);
+        xnorm[2] = 1.0-xnorm[2];
+        return xnorm
     }
 
     public static unnormalize(x:number[], xoff: number[], scale: number) {
@@ -99,6 +104,7 @@ export class ScaleLayer extends Layer {
     return Vector.multiply(x, this.scale);
   }
 }
+
 
 // ===================================================
 

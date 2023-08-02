@@ -32,11 +32,16 @@ export class SerialRobot {
 
     private  pi: number = 3.141592653;    // PI
 
+    // IK modell
     public ikModel: any;
+
     public jointLength: number[] = [];
     public nJoints: number
     private xe: number[] = [0,0,0,0];
+
     private jointStates: number[] = [0,0,0,0];
+    private jointStatesMin: number[] = [-this.pi, 0, -this.pi, -this.pi/2]
+    private jointStatesMax: number[] = [ this.pi, this.pi, 0,  this.pi/2]
 
     // For plotting joint state history
     public jointStatesHist: {t: number, theta: number, id: string}[] = [];
@@ -44,11 +49,17 @@ export class SerialRobot {
 
     // Just for plotting
     private xCinematic: IXCinematic = {base: [], endeffector: [], joints: []}
-
     public trajectory: Trajectory
+    
 
     // -----------------------------------------------
-    constructor(jointLength: number[], xoff: number[] = [0.5,0.5,0.5], scale: number = 1.0) {
+    constructor(
+      jointLength: number[],
+      xoff: number[] = [0.5,0.5,0.5],
+      scale: number = 1.0,
+      jointStatesMin: number[]| undefined = undefined,
+      jointStatesMax: number[]| undefined = undefined
+    ) {
       // Convention: All jointAngles are in radiants!
 
       this.xoff = xoff;
@@ -58,6 +69,9 @@ export class SerialRobot {
       this.nJoints = jointLength.length
 
       this.trajectory = new Trajectory();
+
+      this.jointStatesMax = jointStatesMax ? jointStatesMax : this.jointStatesMax;
+      this.jointStatesMin = jointStatesMin ? jointStatesMin : this.jointStatesMin;
 
       this.createIKModel();
 
@@ -69,12 +83,12 @@ export class SerialRobot {
     public forwardKinematic(jointStates: number[]) {
 
       const thetaRot = jointStates[0]
-
+  
       const tril = Vector.tril(this.nJoints)
       const jointSum: number[] = Vector.matmul(tril, jointStates.slice(1))
 
-      const r: number[] = Vector.matmul(tril, Vector.multiply(Vector.activation(jointStates,"cos"), this.jointLength)  )
-      const z: number[] = Vector.matmul(tril, Vector.multiply(Vector.activation(jointStates,"sin"), this.jointLength)  )
+      const r: number[] = Vector.matmul(tril, Vector.multiply(Vector.activation(jointSum,"cos"), this.jointLength)  )
+      const z: number[] = Vector.matmul(tril, Vector.multiply(Vector.activation(jointSum,"sin"), this.jointLength)  )
 
       const x: number[] = r.map((v:number) => v*Math.cos(thetaRot));
       const y: number[] = r.map((v:number) => v*Math.sin(thetaRot));
@@ -87,30 +101,30 @@ export class SerialRobot {
 
       this.xCinematic = {
         base: [[
-          Vector.normalize([-0.1,0,0], this.xoff, this.scale),
-          Vector.normalize([+0.1,0,0], this.xoff, this.scale)
+          Vector.normalize([-0.1,0,0], this.xoff, this.scale, true),
+          Vector.normalize([+0.1,0,0], this.xoff, this.scale, true)
         ],
         [
-          Vector.normalize([0,-0.1,0], this.xoff, this.scale),
-          Vector.normalize([0,+0.1,0], this.xoff, this.scale)
+          Vector.normalize([0,-0.1,0], this.xoff, this.scale, true),
+          Vector.normalize([0,+0.1,0], this.xoff, this.scale, true)
         ]], 
         endeffector: [[
-          Vector.normalize([x[x.length-1],y[x.length-1], z[x.length-1]], this.xoff, this.scale),
-          Vector.normalize([x[x.length-2],y[x.length-2], z[x.length-2]], this.xoff, this.scale),
+          Vector.normalize([x[x.length-1],y[x.length-1], z[x.length-1]], this.xoff, this.scale, true),
+          Vector.normalize([x[x.length-2],y[x.length-2], z[x.length-2]], this.xoff, this.scale, true),
         ]], 
         joints: this.jointLength.map((_:number,idx:number) => idx === 0 ?
          [
-          Vector.normalize([0,0,0], this.xoff, this.scale),
-          Vector.normalize([x[idx],y[idx],z[idx]], this.xoff, this.scale),
+          Vector.normalize([0,0,0], this.xoff, this.scale, true),
+          Vector.normalize([x[idx],y[idx],z[idx]], this.xoff, this.scale, true),
         ]:
         [
-          Vector.normalize([x[idx-1],y[idx-1],z[idx-1]], this.xoff, this.scale),
-          Vector.normalize([x[idx],y[idx],z[idx]], this.xoff, this.scale),
+          Vector.normalize([x[idx-1],y[idx-1],z[idx-1]], this.xoff, this.scale, true),
+          Vector.normalize([x[idx],y[idx],z[idx]], this.xoff, this.scale, true),
         ] )
       }
 
 
-      return {status: 0, x: Vector.normalize([x[x.length-1],y[x.length-1], z[x.length-1]], this.xoff, this.scale)}
+      return {status: 0, x: Vector.normalize([x[x.length-1],y[x.length-1], z[x.length-1]], this.xoff, this.scale, true)}
     }
 
     // -----------------------------------------------
@@ -121,7 +135,6 @@ export class SerialRobot {
           new ScaleLayer({scale: [1/1.4, 1/1.4, 1/this.pi]}),
           new DenseLayer({units: 120, activation: "relu", name: "dense"}),
           new DenseLayer({units: 3, activation: "tanh", name:"dense_1"}),
-          new ScaleLayer({scale: [this.pi, this.pi, this.pi], name: "postprocessing"}),
         ], name:"model"
       })
 
@@ -132,17 +145,26 @@ export class SerialRobot {
     // -----------------------------------------------
     public inverseKinematic(xstar: number[]) {
 
-      console.log("InverseKinematic")
-      console.log(xstar)
+      // we must invert z for this robot
+      xstar[2] = 1.0-xstar[2]
+
       const xe = Vector.unnormalize(xstar.slice(0,-1), this.xoff, this.scale);
-      console.log(xe)
+
       const tiltEndeffector = xstar[3];
       const thetaRot = Math.atan2(xe[1],xe[0]);
 
       const r = Math.sqrt(xe[0]*xe[0] + xe[1]*xe[1]);
 
-      
-      this.jointStates = [thetaRot, ...this.ikModel.predict([r,xe[2],tiltEndeffector])]
+
+
+
+      // Call the neural network
+      this.jointStates = [
+        thetaRot,
+        ...Vector.add(
+          this.jointStatesMin.slice(1),
+          Vector.multiply(this.ikModel.predict([r,xe[2],tiltEndeffector]), Vector.substract(this.jointStatesMax.slice(1), this.jointStatesMin.slice(1)) ))
+      ]
       
       console.log(r, xe[2])
       console.log(this.jointStates )

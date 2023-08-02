@@ -95,8 +95,8 @@ export default function PlotRobot({robot, xaxis, yaxis, xcursor, setXcursor, upd
     if (btn === 0) {
         const m = _getRelativeMousePos(ex, ey)
         let x = xcursor;
-        x[xaxis] = xaxis!==2 ? m!.x  : 1-m!.x;
-        x[yaxis] = xaxis!==2 ? m!.y  : 1-m!.y;
+        x[xaxis] = m!.x;
+        x[yaxis] = m!.y;
         setXcursor([...x]);
         return
     } 
