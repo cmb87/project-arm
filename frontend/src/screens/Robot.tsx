@@ -163,9 +163,7 @@ export default function Robot() {
             />
           </div>
           
-          <pre>
-            {JSON.stringify(info, null, 2)}
-          </pre>
+
          
         </div>
 
@@ -174,7 +172,12 @@ export default function Robot() {
 
         <div className="border border-gray-300 rounded-xl p-5 col-span-1">
           <PlotTimeseries robot={robot} update={update}/>
+
+          <pre>
+            {JSON.stringify(info, null, 2)}
+          </pre>
         </div>
+
 
       </div>
 
