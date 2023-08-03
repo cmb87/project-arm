@@ -125,6 +125,7 @@ export class SerialRobot {
 
 
       return {status: 0, x: Vector.normalize([x[x.length-1],y[x.length-1], z[x.length-1]], this.xoff, this.scale, true)}
+
     }
 
     // -----------------------------------------------
@@ -155,9 +156,6 @@ export class SerialRobot {
 
       const r = Math.sqrt(xe[0]*xe[0] + xe[1]*xe[1]);
 
-
-
-
       // Call the neural network
       this.jointStates = [
         thetaRot,
@@ -166,13 +164,9 @@ export class SerialRobot {
           Vector.multiply(this.ikModel.predict([r,xe[2],tiltEndeffector]), Vector.substract(this.jointStatesMax.slice(1), this.jointStatesMin.slice(1)) ))
       ]
       
-      console.log(r, xe[2])
-      console.log(this.jointStates )
-
       const error = this.forwardKinematic(this.jointStates).x.reduce((sum:number,xfstar:number,idx:number) => sum+(xfstar-xstar[idx])*(xfstar-xstar[idx]),0)
 
-
-      return {status: 0, jointAngles: this.jointStates}
+      return {status: 0, jointAngles: this.jointStates, mse: error}
     }
 
 
@@ -182,7 +176,7 @@ export class SerialRobot {
     }
 
     // -----------------------------------------------
-    public getCurrentEndEffectorPosition(normalized:boolean = true) {
+    public getCurrentEndEffectorPosition(normalized:boolean = false) {
       return normalized? Vector.normalize(this.xe, this.xoff, this.scale) : this.xe;
     }
 
@@ -228,16 +222,50 @@ export class SerialRobot {
       
       const component: string[] = ["base", "endeffector", "joints"];
       const colors = {
-        base: "rgba(10, 10, 10, 0.8)",
-        endeffector: "rgba(0, 0, 0, 0.8)",
-        joints: "rgba(165, 165, 165, 0.8)"
+        base: "rgba(10, 10, 10, 1.0)",
+        endeffector: "rgba(0, 0, 0, 1.0)",
+        joints: "rgba(165, 165, 165, 1.0)"
       }
 
       const xe = this.xCinematic["endeffector" as keyof typeof this.xCinematic][0][0]
 
       // -----------------------------------------
+      if (yaxis == 2) {
+      ctx.fillStyle = "rgba(0, 0, 255, 0.2)";
+      ctx.fillRect(
+        0,
+        0,
+        iw,
+        (1-this.xoff[2])*ih  
+      );
+
+      ctx.fillStyle = "rgba(128,0,0, 0.2)";
+      ctx.fillRect(
+        0,
+        (1-this.xoff[2])*ih,
+        iw,
+        ih  
+      ); 
+      } else {
+        ctx.fillStyle = "rgba(128,0,0, 0.2)";
+        ctx.fillRect(
+          0,
+          0,
+          iw,
+          ih  
+        ); 
+      }
+      ctx.stroke();
+
+      ctx.font = "20px mono";
+      ctx.fillStyle = "rgba(0, 0, 0, 1.0)";
+      ctx.fillText(`${this.xe[xaxis].toFixed(2)}m`, (xe[xaxis])*iw-10, ih-10);
+      ctx.fillText(`${this.xe[yaxis].toFixed(2)}m`, 10, (xe[yaxis] )*ih-10);
+      ctx.stroke();
+      
+      // -----------------------------------------
       ctx.lineWidth = 3;
-      ctx.setLineDash([5, 15]);
+      ctx.setLineDash([10, 15]);
       ctx.strokeStyle = "rgba(0, 0, 0, 0.4)"
       ctx.beginPath();
       ctx.moveTo(

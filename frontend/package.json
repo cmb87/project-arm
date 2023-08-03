@@ -12,6 +12,7 @@
     "@types/react-dom": "^18.2.7",
     "axios": "^1.4.0",
     "react": "^18.2.0",
+    "react-circular-input": "^0.2.4",
     "react-data-table-component": "^7.5.3",
     "react-dom": "^18.2.0",
     "react-icons": "^4.10.1",

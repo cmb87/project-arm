@@ -17,7 +17,6 @@ import { SerialRobot } from '../robots/serialRobot';
 interface IScatterPlot {
   robot: DeltaRobot | SerialRobot | undefined
   update:boolean | number
-  data: any
 }
 
 // https://www.colamda.de/blog/2020-12-03-React-Vega-Lifecycle/

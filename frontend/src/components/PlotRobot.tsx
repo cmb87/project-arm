@@ -16,10 +16,11 @@ interface IPlotRobot {
     setXcursor: Function
     update: boolean | number
     waypointSetTrigger: Function
+    imageUrl?: any
 }
 
 
-export default function PlotRobot({robot, xaxis, yaxis, xcursor, setXcursor, update, waypointSetTrigger}: IPlotRobot) {
+export default function PlotRobot({robot, xaxis, yaxis, xcursor, setXcursor, update, waypointSetTrigger, imageUrl}: IPlotRobot) {
 
   //e:number, f:number, re:number, rf:number, xoff: number = 0, yoff: number = 0, zoff: number = 0
   //const robot = // e,f,re,rf
@@ -111,7 +112,7 @@ export default function PlotRobot({robot, xaxis, yaxis, xcursor, setXcursor, upd
           ref={canvas}
           width={300}
           height={300}
-          style={{ cursor: 'crosshair'}} // backgroundImage: , `url(${imageUrl})`, backgroundSize: "100% 100%" 
+          style={{ cursor: 'crosshair',  backgroundImage: imageUrl ? `url(${imageUrl})` : "", backgroundSize: "100% 100%"}}// 
           onMouseDown={(e) => hoverCb(e.clientX, e.clientY, e.button)}
           //onMouseUp={(e) => clickBtnUpCb(e.clientX, e.clientY, e.button)}
           //onMouseLeave={(e) => {setAnnotationSelected(null)}}

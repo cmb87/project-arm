@@ -18,9 +18,8 @@ export class DeltaRobot {
     private re: number
     private rf: number
 
-    private xoff: number
-    private yoff: number
-    private zoff: number
+    private xoff: number[]
+    private scale: number
 
     private  sqrt3: number = Math.sqrt(3.0);
     private  pi: number = 3.141592653;    // PI
@@ -44,15 +43,14 @@ export class DeltaRobot {
     public trajectory: Trajectory
 
     // -----------------------------------------------
-    constructor(e:number, f:number, re:number, rf:number, xoff: number = 0, yoff: number = 0, zoff: number = 0) {
+    constructor(e:number, f:number, re:number, rf:number, xoff: number[] = [0.5,0.5,0.5], scale: number = 1.0) {
       this.e = e;     // end effector
       this.f = f;     // base
       this.re = re;
       this.rf = rf;
 
       this.xoff = xoff;
-      this.yoff = yoff;
-      this.zoff = zoff;
+      this.scale = scale;
 
       this.trajectory = new Trajectory();
 
@@ -61,26 +59,23 @@ export class DeltaRobot {
 
 
     // -----------------------------------------------
-    public forwardKinematic(theta1: number, theta2: number, theta3: number) {
+    public forwardKinematic(jointStates: number[]) {
 
       const t: number  = (this.f-this.e)*this.tan30/2;
-      const dtr: number  = this.pi/180.0;
+
+      jointStates = jointStates
+      this.jointStates = [...jointStates]
+
+      const y1: number  = -(t + this.rf*Math.cos(jointStates[0]));
+      const z1: number  = -this.rf*Math.sin(jointStates[0]);
   
-      // Convert to radiants
-      theta1 *= dtr;
-      theta2 *= dtr;
-      theta3 *= dtr;
-  
-      const y1: number  = -(t + this.rf*Math.cos(theta1));
-      const z1: number  = -this.rf*Math.sin(theta1);
-  
-      const y2: number = (t + this.rf*Math.cos(theta2))*this.sin30;
+      const y2: number = (t + this.rf*Math.cos(jointStates[1]))*this.sin30;
       const x2: number= y2*this.tan60;
-      const z2: number = -this.rf*Math.sin(theta2);
+      const z2: number = -this.rf*Math.sin(jointStates[1]);
   
-      const y3: number = (t + this.rf*Math.cos(theta3))*this.sin30;
+      const y3: number = (t + this.rf*Math.cos(jointStates[2]))*this.sin30;
       const x3: number = -y3*this.tan60;
-      const z3: number = -this.rf*Math.sin(theta3);
+      const z3: number = -this.rf*Math.sin(jointStates[2]);
   
       const dnm: number = (y2-y1)*x3-(y3-y1)*x2;
   
@@ -111,9 +106,11 @@ export class DeltaRobot {
 
       // Store internally
       this.xe = [xe, ye, ze]
-      this.jointStates = [theta1, theta2, theta3]
+      
 
-      return {status: 0, x: [xe+this.xoff, ye+this.yoff, ze+this.zoff]}
+      this.calculateGeometry();
+
+      return {status: 0, x:  Vector.normalize(this.xe, this.xoff, this.scale, true)}
     }
 
     // -----------------------------------------------
@@ -133,36 +130,47 @@ export class DeltaRobot {
 
       const yj: number = (y1 - a*b - Math.sqrt(d))/(b*b + 1); // choosing outer point
       const zj: number = a + b*yj;
-      theta = 180.0*Math.atan(-zj/(y1 - yj))/this.pi + ((yj>y1)?180.0:0.0);
+      theta = Math.atan(-zj/(y1 - yj)) + ((yj>y1)?this.pi:0.0);
 
       return {status: 0, theta: theta}
     }
 
     // -----------------------------------------------
-    public inverseKinematic(x0: number, y0: number, z0: number) {
+    public inverseKinematic(xstar: number[]) {
 
-      x0 = x0 - this.xoff;
-      y0 = y0 - this.yoff;
-      z0 = z0 - this.zoff;
+      // we must invert z for this robot
 
+      xstar[2] = 1.0-xstar[2]
+      const xe = Vector.unnormalize(xstar, this.xoff, this.scale);
 
-      const res1 = this.delta_calcAngleYZ(x0, y0, z0);
-      const res2 = this.delta_calcAngleYZ(x0*this.cos120 + y0*this.sin120, y0*this.cos120-x0*this.sin120, z0);
-      const res3 = this.delta_calcAngleYZ(x0*this.cos120 - y0*this.sin120, y0*this.cos120+x0*this.sin120, z0);
+      const res1 = this.delta_calcAngleYZ(xe[0], xe[1], xe[2]);
+      const res2 = this.delta_calcAngleYZ(xe[0]*this.cos120 + xe[1]*this.sin120, xe[1]*this.cos120-xe[0]*this.sin120, xe[2]);
+      const res3 = this.delta_calcAngleYZ(xe[0]*this.cos120 - xe[1]*this.sin120, xe[1]*this.cos120+xe[0]*this.sin120, xe[2]);
 
-      return {status: res1.status+res2.status+res3.status, jointAngles: [res1.theta, res2.theta, res3.theta]}
+      this.jointStates = [res1.theta, res2.theta, res3.theta];
+
+      const xf = this.forwardKinematic(this.jointStates);
+
+      if ( xf !== -1 ) {
+        const error = xf.x.reduce((sum:number,xfstar:number,idx:number) => sum+(xfstar-xstar[idx])*(xfstar-xstar[idx]),0)
+        return {status: 0, jointAngles: this.jointStates, mse: error}
+      }
+      
+      return {status: -1, jointAngles: [0,0,0], mse: 9999}
+      
     }
 
 
     // -----------------------------------------------
-    public getCurrentJointStates() {
-      return this.jointStates.map((x:number) => x/this.pi*180)
+    public getCurrentJointStates(radiants: boolean = true) {
+      return this.jointStates.map((x:number) => radiants ? x : x/this.pi*180)
     }
 
     // -----------------------------------------------
-    public getCurrentEndEffectorPosition() {
-      return [this.xe[0]+this.xoff, this.xe[1]+this.yoff, this.xe[2]+this.zoff]
+    public getCurrentEndEffectorPosition(normalized:boolean = false) {
+      return normalized? Vector.normalize(this.xe, this.xoff, this.scale) : this.xe;
     }
+
     // -----------------------------------------------
     public async run(dt: number=100, updateTrigger: Function = ()=>{}) {
 
@@ -178,7 +186,7 @@ export class DeltaRobot {
         const jointStatesTarget = this.trajectory.getJointTarget(t);
   
         // Run forward kinematic
-        this.forwardKinematic(jointStatesTarget[0], jointStatesTarget[1], jointStatesTarget[2]);
+        this.forwardKinematic(jointStatesTarget);
 
         // For cinematic
         this.calculateGeometry();
@@ -266,15 +274,44 @@ export class DeltaRobot {
       ]
 
       this.xCinematic = {
-        base: [[xp1, xp2, xp3, xp1]],
-        endeffector: [[xep1, xep2, xep3, xep1]],
+        base: [[
+          Vector.normalize(xp1, this.xoff, this.scale, true),
+          Vector.normalize(xp2, this.xoff, this.scale, true),
+          Vector.normalize(xp3, this.xoff, this.scale, true),
+          Vector.normalize(xp1, this.xoff, this.scale, true),
+        ]],
+        endeffector: [
+          [
+          Vector.normalize(xep1, this.xoff, this.scale, true),
+          Vector.normalize(xep2, this.xoff, this.scale, true),
+          Vector.normalize(xep3, this.xoff, this.scale, true),
+          Vector.normalize(xep1, this.xoff, this.scale, true),
+          ]],
         joints: [
-          [xf1, xrf1],
-          [xf2, xrf2],
-          [xf3, xrf3],
-          [xrf1, xe1],
-          [xrf2, xe2],
-          [xrf3, xe3]
+          [
+            Vector.normalize(xf1, this.xoff, this.scale, true),
+            Vector.normalize(xrf1, this.xoff, this.scale, true),
+          ],
+          [
+            Vector.normalize(xf2, this.xoff, this.scale, true),
+            Vector.normalize(xrf2, this.xoff, this.scale, true),
+          ],
+          [
+            Vector.normalize(xf3, this.xoff, this.scale, true),
+            Vector.normalize(xrf3, this.xoff, this.scale, true),
+          ],
+          [
+            Vector.normalize(xrf1, this.xoff, this.scale, true),
+            Vector.normalize(xe1, this.xoff, this.scale, true),
+          ],
+          [
+            Vector.normalize(xrf2, this.xoff, this.scale, true),
+            Vector.normalize(xe2, this.xoff, this.scale, true),
+          ],
+          [
+            Vector.normalize(xrf3, this.xoff, this.scale, true),
+            Vector.normalize(xe3, this.xoff, this.scale, true),
+          ]
         ]
       }
 
@@ -285,12 +322,46 @@ export class DeltaRobot {
 
       
       const component: string[] = ["base", "endeffector", "joints"];
-      const xoff = [this.xoff, this.yoff, this.zoff]
       const colors = {
-        base: "rgba(10, 10, 10, 0.8)",
-        endeffector: "rgba(0, 0, 0, 0.8)",
-        joints: "rgba(165, 165, 165, 0.8)"
+        base: "rgba(10, 10, 10, 1.0)",
+        endeffector: "rgba(0, 0, 0, 1.0)",
+        joints: "rgba(165, 165, 165, 1.0)"
       }
+      
+      const xe =  Vector.normalize([...this.xe], this.xoff, this.scale, true) 
+
+      // ----------------------------------------
+      if (yaxis == 2) {
+        ctx.fillStyle = "rgba(128,0,0, 0.2)";
+        ctx.fillRect(
+          0,
+          (1-this.xoff[2]  + (this.rf+this.re)/this.scale )*ih, 
+          iw,
+          ih  
+        );
+        ctx.fillStyle = "rgba(0, 0, 255, 0.2)";
+        ctx.fillRect(
+          0,
+          0,
+          iw,
+          (1-this.xoff[2]  + (this.rf+this.re)/this.scale )*ih,   
+        ); 
+        } else {
+          ctx.fillStyle = "rgba(128,0,0, 0.2)";
+          ctx.fillRect(
+            0,
+            0,
+            iw,
+            ih  
+          ); 
+        }
+      ctx.stroke();
+
+      ctx.font = "20px mono";
+      ctx.fillStyle = "rgba(0, 0, 0, 1.0)";
+      ctx.fillText(`${this.xe[xaxis].toFixed(2)}m`, (xe[xaxis])*iw-10, ih-10);
+      ctx.fillText(`${this.xe[yaxis].toFixed(2)}m`, 10, (xe[yaxis] )*ih-10);
+      ctx.stroke();
 
       // -----------------------------------------
       ctx.lineWidth = 3;
@@ -299,13 +370,13 @@ export class DeltaRobot {
       ctx.beginPath();
       ctx.moveTo(
         Math.floor(
-          (this.xe[xaxis] + xoff[xaxis])*iw  
+          (xe[xaxis])*iw  
         ),
         0
       );
       ctx.lineTo(
         Math.floor(
-          (this.xe[xaxis] + xoff[xaxis])*iw
+          (xe[xaxis] )*iw
         ),
         ih
       );
@@ -315,13 +386,13 @@ export class DeltaRobot {
       ctx.moveTo(
         0,
         Math.floor(
-          (this.xe[yaxis] + xoff[xaxis])*ih  
+          (xe[yaxis] )*ih  
         ),
       );
       ctx.lineTo(
         iw,
         Math.floor(
-          (this.xe[yaxis] + xoff[xaxis])*ih  
+          (xe[yaxis] )*ih  
         )
       );
       ctx.stroke();
@@ -341,29 +412,29 @@ export class DeltaRobot {
             ctx.beginPath();
             ctx.moveTo(
               Math.floor(
-                (x[i][j][xaxis] + xoff[xaxis])*iw  
+                (x[i][j][xaxis] )*iw  
               ),
               Math.floor(
-                (x[i][j][yaxis] + xoff[yaxis])*ih
+                (x[i][j][yaxis] )*ih
               )
             );
             ctx.lineTo(
               Math.floor(
-                (x[i][j+1][xaxis] + xoff[xaxis])*iw
+                (x[i][j+1][xaxis] )*iw
               ),
               Math.floor(
-                (x[i][j+1][yaxis] + xoff[yaxis])*ih
+                (x[i][j+1][yaxis] )*ih
               )
             );
 
             ctx.fillRect(
-              Math.floor((x[i][j][xaxis] + xoff[xaxis])*iw )-5,
-              Math.floor((x[i][j][yaxis] + xoff[yaxis])*ih )-5,
+              Math.floor((x[i][j][xaxis])*iw )-5,
+              Math.floor((x[i][j][yaxis])*ih )-5,
               10,10
             );
             ctx.fillRect(
-              Math.floor((x[i][j+1][xaxis] + xoff[xaxis])*iw )-5,
-              Math.floor((x[i][j+1][yaxis] + xoff[yaxis])*ih )-5,
+              Math.floor((x[i][j+1][xaxis] )*iw )-5,
+              Math.floor((x[i][j+1][yaxis] )*ih )-5,
               10,10
             );
             
