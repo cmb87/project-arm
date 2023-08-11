@@ -38,4 +38,3 @@ difference(){
 translate([0,0,11])cylinder(r=60/2, h=30-2*11, $fn=40);
 translate([0,0,-1])cylinder(r=44/2, h=32, $fn=40);
 }
-

@@ -1,1 +1,0 @@
-docker run -ti -e DISPLAY=":1" -v /tmp/.X11-unix:/tmp/.X11-unix moveit/moveit2:humble-release bash
