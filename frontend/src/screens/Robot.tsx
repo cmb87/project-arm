@@ -15,7 +15,7 @@ import Slider from '../components/Slider';
 import background from '../assets/test.png';
 
 
-export default function Robot() {
+export default function Robot({socket}:any) {
 
   //e:number, f:number, re:number, rf:number, xoff: number = 0, yoff: number = 0, zoff: number = 0
   //const robot = // e,f,re,rf
@@ -66,6 +66,17 @@ export default function Robot() {
     
   }, [robotType])
 
+  // -----------------------------------------------------------
+  useEffect(()=> {
+    if (!socket) return
+
+    socket.on("joint_states", (data:any) => {
+      robot!.forwardKinematic([...data.joint_states])
+      setUpdate(!update);
+    })
+
+  }, [socket, robot, update])
+
   // --------------------- Update robot geometry based on cursor move -------------------
   useEffect( () => {
 
@@ -74,7 +85,6 @@ export default function Robot() {
     if (thetaCursor.status !== 0 ) return 
 
     setUpdate(!update);
-
 
   }, [xcursor, tilt])
 

@@ -1,0 +1,5 @@
+python-socketio
+pillow
+numpy
+boto3
+requests

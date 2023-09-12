@@ -78,7 +78,6 @@ export class Trajectory {
 
       var xtarget = new Array(this.njoints);
       
-
       for (var i=0 ; i<this.njoints; i++ ) {
         xtarget[i] = trCurr.parameters[0][i] + trCurr.parameters[1][i]*dt + trCurr.parameters[2][i]*dt*dt + trCurr.parameters[3][i]*dt*dt*dt; 
       }
@@ -88,6 +87,14 @@ export class Trajectory {
 
       return xtarget
     }
+
+    // -----------------------------------------------
+    public getAllTargets() {
+      return this.traj
+    }
+
+
+
     // -----------------------------------------------
     public plot(ctx: CanvasRenderingContext2D, iw: number, ih: number, xaxis: number=0, yaxis: number= 2) {
 

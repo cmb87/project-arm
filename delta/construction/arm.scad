@@ -33,8 +33,11 @@ translate([50,-7,-10+3])cylinder(r=5/2, h=10, $fn=40);
 }
 
 
-
+color("red"){
 difference(){
 translate([0,0,11])cylinder(r=60/2, h=30-2*11, $fn=40);
 translate([0,0,-1])cylinder(r=44/2, h=32, $fn=40);
 }
+}
+
+

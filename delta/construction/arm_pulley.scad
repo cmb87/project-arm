@@ -82,6 +82,7 @@ function tooth_spaceing_curvefit (b,c,d)
 function tooth_spacing(tooth_pitch,pitch_line_offset)
 	= (2*((teeth*tooth_pitch)/(3.14159265*2)-pitch_line_offset)) ;
     
+
 difference(){
 if ( profile == 1 ) { pulley ( "MXL" , MXL_pulley_dia , 0.508 , 1.321 ); }
 if ( profile == 2 ) { pulley ( "40 D.P." , 40DP_pulley_dia , 0.457 , 1.226 ); }

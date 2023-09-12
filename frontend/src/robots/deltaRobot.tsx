@@ -1,7 +1,7 @@
 import { Trajectory } from "./trajectory";
 import { Vector } from "./vector";
 
-
+// https://hypertriangle.com/~alex/delta-robot-tutorial/
 
 
 export interface IXCinematic {
@@ -203,6 +203,21 @@ export class DeltaRobot {
       }
 
     }
+    // -----------------------------------------------
+    public async runRobot(dt: number=100, updateTrigger: Function = ()=>{}, socket: any) {
+
+      this.trajectory.start();
+
+      
+      for (let i = 0; i < this.trajectory.getAllTargets().length; i++) {
+        const target = this.trajectory.getAllTargets()[i];
+
+        
+      }
+
+    }
+
+
 
     // -----------------------------------------------
     public calculateGeometry() {

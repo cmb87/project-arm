@@ -1,14 +1,16 @@
 import React, {useContext, useState, useEffect} from 'react';
 import {Navigate, Route, Routes} from "react-router-dom";
+import * as io from "socket.io-client";
+
 import Header from "./components/Header";
 import { BsBugFill } from 'react-icons/bs';
 import './App.css';
 
 import Footer from './components/Footer';
 import Robot from './screens/Robot';
-import './App.css';
 
 
+const socket = io.connect("http://localhost:5001/web");
 
 
 
@@ -35,8 +37,7 @@ function App() {
                   {/* <RequestInterceptor> */}
                     <Routes>
                       
-  
-                      <Route path="robot" element={<Robot/>}/>
+                      <Route path="robot" element={<Robot socket={socket}/>}/>
 
                     </Routes>
                   {/* </RequestInterceptor> */}

@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.spatial import Delaunay
 
-
+# See https://hypertriangle.com/~alex/delta-robot-tutorial/
 
 class Delta:
 
@@ -20,6 +20,42 @@ class Delta:
         self.re = re
         self.rf = rf
  
+
+    def _calcAngleYZ(self, x0, y0, z0):
+
+        y1 = -0.5 * 0.57735 * self.f # f/2 * tg 30
+        y0 -= 0.5 * 0.57735 * self.e    # shift center to edge
+        # z = a + b*y
+        a = (x0*x0 + y0*y0 + z0*z0 + self.rf*self.rf - self.re*self.re - y1*y1)/(2*z0)
+        b = (y1-y0)/z0
+        # discriminant
+        d = -(a+b*y1)*(a+b*y1)+self.rf*(b*b*self.rf+self.rf) 
+        if (d < 0):
+            return -1, None # non-existing point
+
+        yj = (y1 - a*b - np.sqrt(d))/(b*b + 1) # choosing outer point
+        zj = a + b*yj
+
+        if (yj>y1):
+            theta = 180.0*np.arctan(-zj/(y1 - yj))/np.pi + 180.0
+        else:
+            theta = 180.0*np.arctan(-zj/(y1 - yj))/np.pi
+
+        return 0, theta
+
+
+    def inverse(self, x0, y0, z0):
+        # inverse kinematics: (x0, y0, z0) -> (theta1, theta2, theta3)
+        # returned status: 0=OK, -1=non-existing position
+        status, theta1 = self._calcAngleYZ(x0, y0, z0)
+
+        if (status == 0):
+            status, theta2 = self._calcAngleYZ(x0*self.cos120 + y0*self.sin120, y0*self.cos120-x0*self.sin120, z0)  # rotate coords to +120 deg
+        if (status == 0):
+            status, theta3 = self._calcAngleYZ(x0*self.cos120 - y0*self.sin120, y0*self.cos120+x0*self.sin120, z0)  # rotate coords to -120 deg
+
+        return status, [theta1, theta2, theta3]
+
 
     def calcForward(self,theta):
         [theta1,  theta2,  theta3] = theta
@@ -77,8 +113,19 @@ if __name__ == "__main__":
     nmax = 10000
     theta = thetaMin + (thetaMax-thetaMin) * np.random.rand(nmax,3)
 
-    delta = Delta(e=0.5,f=0.11,re=0.25,rf=0.5)
+    delta = Delta(e=0.138,f=0.474,re=0.384,rf=0.18)
 
+    
+    x0 = delta.calcForward([40.0,40.0,40.0])
+    valid, theta1 = delta.inverse(*[-0.2, 0.0, -0.4194879595738985])
+    valid, theta2 = delta.inverse(*[+0.2, 0.0, -0.4194879595738985])
+    valid, theta3 = delta.inverse(*[0.0, -0.2, -0.4194879595738985])
+    valid, theta4 = delta.inverse(*[0.0, +0.2, -0.4194879595738985])
+    print(theta1)
+    print(theta2)
+    print(theta3)
+    print(theta4)
+    sys.exit()
 
 
     x = np.stack([x  for x in [delta.calcForward(theta[n,:])  for n in range(nmax)] if not x == -1 ])
@@ -106,29 +153,3 @@ if __name__ == "__main__":
     plt.grid(True)
     plt.show()
 
-#  # inverse kinematics
-#  # helper functions, calculates angle theta1 (for YZ-pane)
-#  int delta_calcAngleYZ( x0,  y0,  z0,  &theta) {
-#       y1 = -0.5 * 0.57735 * f # f/2 * tg 30
-#      y0 -= 0.5 * 0.57735    * e    # shift center to edge
-#      # z = a + b*y
-#       a = (x0*x0 + y0*y0 + z0*z0 +rf*rf - re*re - y1*y1)/(2*z0)
-#       b = (y1-y0)/z0
-#      # discriminant
-#       d = -(a+b*y1)*(a+b*y1)+rf*(b*b*rf+rf) 
-#      if (d < 0) return -1 # non-existing point
-#       yj = (y1 - a*b - np.sqrt(d))/(b*b + 1) # choosing outer point
-#       zj = a + b*yj
-#      theta = 180.0*atan(-zj/(y1 - yj))/pi + ((yj>y1)?180.0:0.0)
-#      return 0
-#  }
- 
-#  # inverse kinematics: (x0, y0, z0) -> (theta1, theta2, theta3)
-#  # returned status: 0=OK, -1=non-existing position
-#  int delta_calcInverse( x0,  y0,  z0,  &theta1,  &theta2,  &theta3) {
-#      theta1 = theta2 = theta3 = 0
-#      int status = delta_calcAngleYZ(x0, y0, z0, theta1)
-#      if (status == 0) status = delta_calcAngleYZ(x0*cos120 + y0*sin120, y0*cos120-x0*sin120, z0, theta2)  # rotate coords to +120 deg
-#      if (status == 0) status = delta_calcAngleYZ(x0*cos120 - y0*sin120, y0*cos120+x0*sin120, z0, theta3)  # rotate coords to -120 deg
-#      return status
-#  }
