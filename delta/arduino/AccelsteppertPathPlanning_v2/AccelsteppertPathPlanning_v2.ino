@@ -244,7 +244,7 @@ void loop(){
     );
 
     // ------------------ Motion Planning and Execution -----------------------
-    // Execute motion
+    // Execute motion (move() = relative, moveTo() absolute)
     Xaxis.moveTo(controllStruct.theta1*Multiplier);
     Yaxis.moveTo(controllStruct.theta2*Multiplier);
     Zaxis.moveTo(controllStruct.theta3*Multiplier);
